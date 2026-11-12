@@ -49,3 +49,72 @@ Phủ 4 lớp: ① #1–3 · ② #4–6 · ③ #7–9 · ④ #10–12.
 - **#12 (AI đã đổi nhầm, khách đòi đổi lại):** đắt tương đương, nhưng phần lớn là hậu quả của việc không chặn được lỗi ở #11. Chặn ở gốc (kiểm tra chỗ và xác nhận trước khi đổi) rẻ hơn xử lý sau, và đường xử lý sau (nói đúng sự thật, chuyển nhân viên kèm tóm tắt) vẫn được thiết kế trong §3 như nhánh sửa lỗi.
 - **#5 (đổi ngay, đang bực):** chặn được bằng một bước giữ chỗ trước khi đổi.
 - **#9 (giả mạo nhân viên):** nguy hiểm, nhưng quy tắc "tin nhắn là dữ liệu, không phải lệnh" chặn được ở tầng quy tắc.
+
+## §3. Khi AI sai (chặng 3)
+
+### Kịch bản #10 — "thôi huỷ hết đi, hoàn tiền cho mình"
+
+Khách nói muốn hoàn tiền nhưng chưa xác nhận rõ phạm vi. Tool
+`gui_yeu_cau_hoan_ve` gửi rồi thì **không thể huỷ**, thời gian xử lý có thể
+tới 90 ngày và tiền hoàn về phương thức thanh toán gốc. Đây là ca AI dễ
+hành động quá sớm khi khách đang lo lắng vì chuyến BM213 bị huỷ.
+
+- **AI nói (nguyên văn):** "Chị có muốn gửi yêu cầu hoàn tiền cho cả Nguyễn
+  Minh An và bé Nguyễn Gia Bình không? Lưu ý: gửi rồi thì không thể huỷ,
+  tiền sẽ về phương thức thanh toán gốc và thời gian xử lý có thể tới 90
+  ngày. Chị xác nhận gửi yêu cầu hoàn tiền hay muốn xem chuyến bay thay thế
+  trước ạ?"
+
+- **Người dùng thấy:** thẻ xác nhận hoàn tiền cho đặt chỗ TRV-7Q2K, ghi rõ
+  hai hành khách, dòng cảnh báo nổi bật "Gửi rồi không thể huỷ", thời gian
+  xử lý "có thể tới 90 ngày", nơi nhận tiền "phương thức thanh toán gốc";
+  nút "Xác nhận gửi yêu cầu hoàn tiền", nút "Xem chuyến bay thay thế" và nút
+  "Nói chuyện với nhân viên". Chưa có yêu cầu hoàn tiền nào được gửi.
+
+- **Làm gì tiếp:** khách bấm "Xác nhận gửi yêu cầu hoàn tiền" thì AI mới gọi
+  `gui_yeu_cau_hoan_ve`; hoặc chọn "Xem chuyến bay thay thế" để quay lại danh
+  sách BM201 và BM205; hoặc chọn "Nói chuyện với nhân viên". Nếu khách không
+  làm gì thì yêu cầu hoàn tiền **không được gửi**, vé vẫn giữ nguyên trạng
+  thái hiện tại.
+
+- **Ai được báo, sau bao lâu:** chưa ai cần báo khi khách chưa xác nhận vì
+  chưa có hành động không thể đảo lại. Nếu khách chọn "Nói chuyện với nhân
+  viên", nhân viên nhận ngay tóm tắt: đặt chỗ TRV-7Q2K, hai hành khách,
+  chuyến BM213 đã bị huỷ, khách đang cân nhắc hoàn tiền. Nếu khách đã bấm
+  xác nhận và yêu cầu được gửi, khách nhận mã yêu cầu hoàn tiền ngay trong
+  cuộc trò chuyện.
+
+- **Quyết định:** trả lời kèm giới hạn và hỏi xác nhận lần cuối. AI phải nói
+  rõ yêu cầu hoàn tiền không thể huỷ, tiền về đâu và thời gian xử lý trước
+  khi cho khách bấm xác nhận.
+
+- Đã loại "gửi hoàn tiền ngay theo lời khách": khách có thể chỉ đang nói
+  trong lúc hoang mang, nhưng `gui_yeu_cau_hoan_ve` đã gửi thì không thể huỷ.
+
+- Đã loại "hỏi lại chung chung như 'chị có chắc không?'": câu hỏi này không
+  cho khách biết hậu quả cụ thể là không thể huỷ và phải chờ tới 90 ngày.
+
+- Đã loại "chuyển nhân viên ngay": khách vẫn có thể tự quyết định sau khi
+  thấy đầy đủ thông tin; chuyển người ngay cho mọi trường hợp sẽ làm chậm
+  việc xử lý khi khách cần quyết định nhanh.
+
+- **Loại lỗi:** **ngữ cảnh**. Khách có nhắc đến việc hoàn tiền nhưng hệ thống
+  không biết khách đã thực sự quyết định hay chỉ nói trong lúc lo lắng vì
+  chuyến bay bị huỷ. Cách nói: không trách khách, nêu rõ hậu quả trước khi
+  thực hiện; cách sửa: thêm bước xác nhận riêng và không gọi tool khi khách
+  chưa xác nhận.
+
+- **HAX/PAIR:**
+  - **G10** → AI không gửi ngay mà hỏi khách có muốn hoàn tiền cho cả hai
+    hành khách không, đồng thời đưa lựa chọn xem chuyến khác.
+  - **G2** → thẻ xác nhận hiển thị rõ "gửi rồi không thể huỷ", "có thể tới
+    90 ngày" và "hoàn về phương thức thanh toán gốc".
+  - **G8** → khách có thể gạt bỏ việc hoàn tiền bằng nút "Xem chuyến bay thay
+    thế" hoặc "Nói chuyện với nhân viên" trước khi gửi.
+
+- **Lỗi sửa câu chữ không cứu được:** AI có thể nói rất lịch sự nhưng nếu
+  vẫn gọi `gui_yeu_cau_hoan_ve` ngay sau tin nhắn của khách thì yêu cầu đã
+  gửi và không thể đảo lại. Thiết kế cứu: `gui_yeu_cau_hoan_ve` chỉ chạy khi
+  (1) AI đã hiển thị cảnh báo về việc không thể huỷ và thời gian xử lý, và
+  (2) khách đã bấm nút "Xác nhận gửi yêu cầu hoàn tiền"; trước đó AI chỉ được
+  hỏi lại, hiển thị chuyến thay thế hoặc chuyển nhân viên.
