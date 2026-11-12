@@ -366,3 +366,66 @@ Người dùng có thể chuyển đổi 3 nút tình huống để kiểm tra p
 | **[4]** | **HAX G8/G9 + PAIR Feedback & Control** | Khối đếm ngược 20 phút giữ chỗ tạm thời (Mức ②) hoặc đếm ngược 10 phút hoàn tác (Mức ③). |
 | **[5]** | **PAIR Errors + Graceful Failure** | Nút *"Gặp nhân viên"* luôn hiện diện ở mọi bước; tự động đóng gói tóm tắt ngữ cảnh gửi nhân viên. |
 | **[6]** | **HAX G9 · Sửa sai dễ dàng** | Nút *"Sửa: chọn chuyến khác"* trực tiếp ngay trên thẻ xác nhận, không bắt khách phải làm lại từ đầu. |
+
+
+## §6. Tốt là gì
+
+Ba tiêu chí Pass / Fail để đánh giá sản phẩm này:
+
+| # | Tiêu chí | Pass | Fail |
+|---|---|---|---|
+| 1 | **Không đổi vé nếu chưa biết rõ chuyến và hành khách.** | AI giữ chỗ tạm 20 phút, hiển thị chuyến + số HK + cảnh báo dùng lần đổi miễn phí, chờ khách bấm "Xác nhận đổi". | AI gọi `doi_chuyen_bay` ngay khi khách nói "đổi giúp mình" mà chưa xác nhận chuyến nào, đổi cho ai. |
+| 2 | **Không gửi hoàn tiền nếu chưa có cảnh báo và xác nhận riêng.** | AI hiển thị cảnh báo "gửi rồi không thể huỷ" + thời gian 90 ngày + phương thức hoàn tiền; khách phải tích checkbox rồi bấm nút xác nhận riêng. | AI gọi `gui_yeu_cau_hoan_ve` ngay khi khách nói "hoàn tiền đi" hoặc chỉ hỏi chung "chị có chắc không?" mà không nêu hậu quả cụ thể. |
+| 3 | **Không đề xuất chuyến không đủ chỗ cho tất cả hành khách.** | BM217 (còn 1 chỗ, cần 2) bị khoá/mờ trên giao diện, AI giải thích lý do và đề xuất BM201 hoặc BM205 thay thế. | AI đề xuất hoặc đổi sang BM217 mà không kiểm tra số chỗ ≥ số hành khách, dẫn đến tách mẹ và bé 5 tuổi. |
+
+## §7. Demo
+
+### §7.1. Ca demo chính
+
+Mở prototype, mặc định ở **Mức ② (Cần xác nhận)** — mức nhóm đã chốt.
+
+**Luồng demo 5 bước (~4 phút):**
+
+1. **Giới thiệu bối cảnh (30 giây):** Chỉ vào banner đỏ — chuyến BM213 bị huỷ do bão, 2 hành khách (An 34 tuổi + bé Bình 5 tuổi), chính sách đổi miễn phí 1 lần trong 48h.
+2. **Ca #11 — chuyến thiếu chỗ (1 phút):** Bấm chip "#11 Thiếu chỗ BM217". Chỉ ra BM217 bị khoá mờ vì chỉ còn 1 chỗ cho 2 người. AI không đổi mà cảnh báo đỏ, đề xuất 2 chuyến sáng mai đủ chỗ. Chỉ vào đồng hồ đếm ngược 20 phút — giữ chỗ tạm, chưa đổi vé. Bấm "Xác nhận đổi" → hiện đổi thành công.
+3. **Ca mơ hồ (30 giây):** Chuyển về chip "Mơ hồ sáng mai". Chỉ ra AI nhận diện "sáng mai" có 2 chuyến, hỏi lại thay vì tự đoán (nhãn A). Chỉ nút "Chọn chuyến khác" (nhãn F) — sửa dễ, không phải bắt đầu lại.
+4. **Ca #10 — hoàn tiền (1 phút):** Bấm chip "#10 Hoàn tiền". Modal hiện lên: cảnh báo đỏ "gửi rồi không thể huỷ", "tới 90 ngày", "không đền tiền mặt do bão". Checkbox phải tích thì nút mới sáng — AI không tự gửi.
+5. **So sánh 3 mức (1 phút):** Chuyển sang Mức ③ ở Ca #11. Chỉ ra AI tự đổi liều sang BM217, bé 5 tuổi bị rớt lại, lần đổi miễn phí mất. Quay lại Mức ②: giữ chỗ + xác nhận chặn được lỗi này. Mức ① thì an toàn nhất nhưng khách phải tự làm hết.
+
+### §7.2. Phân công lời trình bày
+
+| Thứ tự | Người nói | Nội dung | Thời lượng |
+|---|---|---|---|
+| 1 | **Dương** | Mở prototype, giới thiệu bối cảnh chuyến BM213 bị huỷ, 2 hành khách, chính sách Bay Mẫu. Giải thích tổng quan 3 mức tự chủ và vì sao nhóm chọn Mức ②. | ~1 phút |
+| 2 | **Anhtu** | Demo Ca #11 (thiếu chỗ BM217): bấm nút, chỉ ra BM217 bị khoá, AI cảnh báo đỏ, đề xuất chuyến đủ chỗ. Giải thích kịch bản rủi ro #11 trong §2 và thiết kế UX trong §3. | ~1 phút |
+| 3 | **Duy** | So sánh 3 mức trên Ca #11: bấm toggle Mức ③ → chỉ ra AI tự đổi liều gây tách mẹ con; quay lại Mức ② → giữ chỗ + xác nhận chặn lỗi. Giải thích cost-of-error và bảng tool ở sidebar. | ~1 phút |
+| 4 | **Hùng** | Demo Ca #10 (hoàn tiền): bấm nút, chỉ modal cảnh báo đỏ, checkbox, nút xác nhận riêng. Giải thích vì sao AI không được gửi ngay. Tóm tắt 3 tiêu chí Pass/Fail (§6). | ~1 phút |
+
+### §7.3. Chuẩn bị trả lời khi giảng viên đưa ca lạ
+
+Khi giảng viên hỏi một ca ngoài 12 kịch bản đã chuẩn bị, nhóm dùng **quy trình 3 bước** để trả lời tại chỗ:
+
+**Bước 1 — Phân loại:** Ca này thuộc lớp nào trong 4 lớp?
+- ① Nguồn sự thật → kiểm tra dữ liệu có trong `tra_cuu_dat_cho` không.
+- ② Mơ hồ / thiếu thông tin → hỏi lại, không đoán.
+- ③ Ngoài thẩm quyền → chuyển nhân viên.
+- ④ Đặc thù domain → kiểm tra hành động có đảo lại được không.
+
+**Bước 2 — Áp mức tự chủ:** Tool nào sẽ được gọi? Tra bảng §4:
+- Chỉ đọc → `tra_cuu_dat_cho` → tự làm.
+- Giữ chỗ → `giu_cho_chuyen_moi` → tự làm nếu đủ chỗ.
+- Đổi vé → `doi_chuyen_bay` → bắt buộc khách xác nhận.
+- Hoàn tiền → `gui_yeu_cau_hoan_ve` → bắt buộc cảnh báo + xác nhận riêng.
+- Không có tool → cấm, chuyển nhân viên.
+
+**Bước 3 — Kiểm tra hậu quả:** Nếu AI sai ở ca này thì ai chịu gì? Có đảo lại được không? Nếu không đảo lại được → phải có bước xác nhận riêng trước khi thực hiện.
+
+**Một số ca lạ giảng viên có thể hỏi và cách trả lời:**
+
+| Ca lạ | Phân loại | Nhóm trả lời |
+|---|---|---|
+| "Đổi cho mình An đi, bé Bình ở nhà với ba" | ② Mơ hồ + ④ tách hành khách | AI không tự tách hành khách vì không có tool cho việc này và không rõ người lớn nào đi cùng bé. Chuyển nhân viên kèm tóm tắt yêu cầu. |
+| "Mình bay chuyến 7h sáng, cho bé Bình bay chuyến 9h30" | ④ Tách 2 chuyến khác nhau | Ngoài phạm vi lát cắt (đổi chỗ là đổi cả đặt chỗ, không tách vé). AI giải thích giới hạn, chuyển nhân viên. |
+| "Hãng đền tiền taxi ra sân bay cho mình đi" | ③ Ngoài thẩm quyền | Không có tool xử lý bồi thường. Chính sách Bay Mẫu: huỷ do bão không đền tiền mặt. AI nói rõ chính sách, chuyển nhân viên nếu khách muốn khiếu nại. |
+| "Mình quên mật khẩu app, giúp reset đi" | ③ Hoàn toàn ngoài phạm vi | Lát cắt chỉ xử lý đặt chỗ bị huỷ. AI nói đây không phải việc mình hỗ trợ được, chuyển nhân viên hoặc hướng dẫn liên hệ bộ phận kỹ thuật. |
+| "OK đổi đi" (sau khi AI đề xuất 2 chuyến) | ② Mơ hồ — "OK" không rõ chuyến nào | AI không đổi vì "OK" chưa chỉ rõ chuyến. Hỏi lại: "Chị xác nhận đổi sang BM201 (07:00) hay BM205 (09:30) ạ?" |

@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype · T3 Du lịch · Nhóm 001</title>
+  <style>
+    :root {
+      --sky: #0c4a6e;
+      --sky-l: #e0f2fe;
+      --sky-m: #7dd3fc;
+      --ink: #0f172a;
+      --sub: #64748b;
+      --border: #e2e8f0;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --ok: #15803d;
+      --ok-bg: #dcfce7;
+      --warn: #a16207;
+      --warn-bg: #fef9c3;
+      --warn-bd: #fde047;
+      --err: #b91c1c;
+      --err-bg: #fee2e2;
+      --err-bd: #fca5a5;
+      --confirm-bg: #eff6ff;
+      --confirm-bd: #93c5fd;
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: linear-gradient(135deg, #0c4a6e, #1e3a5f);
+      color: #fff;
+      padding: 12px 20px;
+    }
+
+    .topbar-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .topbar h1 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .topbar p {
+      font-size: 12px;
+      opacity: .85;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+    }
+
+    .controls-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ctrl-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .lvl-btn {
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .lvl-btn:hover {
+      border-color: var(--sky);
+    }
+
+    .lvl-btn.on {
+      background: var(--sky);
+      color: #fff;
+      border-color: var(--sky);
+      font-weight: 600;
+    }
+
+    .case-chip {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .case-chip:hover {
+      background: var(--sky-l);
+    }
+
+    .case-chip.on {
+      background: var(--sky-l);
+      border-color: var(--sky);
+      color: var(--sky);
+      font-weight: 600;
+    }
+
+    .sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+    }
+
+    .ctrl-check {
+      font-size: 12px;
+      color: var(--sub);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ctrl-check input {
+      margin-right: 4px;
+      vertical-align: -1px;
+    }
+
+    /* ── LAYOUT (COMPACT & EASY TO OBSERVE) ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 480px 1fr;
+      gap: 16px;
+      max-width: 1060px;
+      margin: 16px auto;
+      padding: 0 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+        max-width: 560px;
+      }
+    }
+
+    /* ── LEFT: CONVERSATION AREA ── */
+    .conv-area {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ctx-strip {
+      background: var(--err-bg);
+      border: 1px solid var(--err-bd);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+    }
+
+    .ctx-strip .tag {
+      display: inline-block;
+      background: var(--err);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      letter-spacing: .3px;
+    }
+
+    .ctx-strip .pax {
+      margin-top: 4px;
+      color: var(--sub);
+      font-size: 12px;
+    }
+
+    .bubble {
+      max-width: 90%;
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .bubble-user {
+      align-self: flex-end;
+      background: var(--sky);
+      color: #fff;
+      border-bottom-right-radius: 3px;
+      margin-left: auto;
+    }
+
+    .bubble-ai {
+      align-self: flex-start;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+      width: 100%;
+    }
+
+    .bubble-ai .sender {
+      font-size: 11px;
+      color: var(--sub);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ref {
+      display: inline-block;
+      font-size: 10.5px;
+      background: var(--sky-l);
+      color: var(--sky);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 700;
+      margin-right: 3px;
+      cursor: help;
+      vertical-align: 1px;
+    }
+
+    body.no-ref .ref {
+      display: none;
+    }
+
+    .ambig-tag {
+      display: inline-block;
+      font-size: 11.5px;
+      background: var(--warn-bg);
+      color: var(--warn);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin: 4px 0;
+    }
+
+    .flight-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 9px;
+      margin-top: 6px;
+      background: #fff;
+      font-size: 12.5px;
+      transition: .15s;
+    }
+
+    .flight-row.picked {
+      border-color: var(--ok);
+      background: var(--ok-bg);
+    }
+
+    .flight-row.no-go {
+      opacity: .65;
+      background: #f8fafc;
+      border-style: dashed;
+    }
+
+    .flight-row .code {
+      font-weight: 700;
+    }
+
+    .flight-row .seats {
+      font-size: 11.5px;
+    }
+
+    .seats-ok {
+      color: var(--ok);
+      font-weight: 600;
+    }
+
+    .seats-bad {
+      color: var(--err);
+      font-weight: 600;
+    }
+
+    .flight-row button {
+      font-size: 11.5px;
+      padding: 5px 10px;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .action-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .action-confirm {
+      background: var(--ok);
+      color: #fff;
+    }
+
+    .action-confirm:hover:not(:disabled) {
+      background: #166534;
+    }
+
+    .action-secondary {
+      background: var(--bg);
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .action-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .action-danger {
+      background: var(--err);
+      color: #fff;
+    }
+
+    .action-danger:hover:not(:disabled) {
+      background: #991b1b;
+    }
+
+    .action-staff {
+      background: var(--card);
+      color: var(--sky);
+      border: 1.5px solid var(--sky);
+    }
+
+    .action-staff:hover {
+      background: var(--sky-l);
+    }
+
+    .hold-card {
+      background: var(--warn-bg);
+      border: 1.5px solid var(--warn-bd);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+    }
+
+    .hold-card .timer {
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--warn);
+    }
+
+    .hold-card .hold-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--warn);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .confirm-card {
+      background: var(--confirm-bg);
+      border: 1.5px solid var(--confirm-bd);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 12.5px;
+    }
+
+    .done-card {
+      background: var(--ok-bg);
+      border: 1.5px solid #86efac;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .done-card .check {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+
+    .risk-card {
+      background: var(--err-bg);
+      border: 1.5px solid var(--err-bd);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #7f1d1d;
+      line-height: 1.45;
+    }
+
+    .undo-card {
+      background: #fef3c7;
+      border: 1.5px solid #fbbf24;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 12.5px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .evidence {
+      font-size: 11px;
+      color: var(--sub);
+      margin-top: 8px;
+      padding: 5px 0 0;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* ── RIGHT: SIDEBAR PANELS (TIGHT & CLEAN) ── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .03);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      background: var(--bg);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-body {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .promise-text {
+      border-left: 3px solid var(--sky);
+      padding: 6px 10px;
+      background: var(--sky-l);
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .tool-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .tool-table th {
+      text-align: left;
+      color: var(--sub);
+      font-weight: 600;
+      padding: 5px 4px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .tool-table td {
+      padding: 6px 4px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+    }
+
+    .tool-table tr.hl td {
+      background: #fffbeb;
+    }
+
+    .tool-table code {
+      font-size: 11.5px;
+      background: var(--bg);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .pill-auto {
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+
+    .pill-ask {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .pill-sug {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .pill-ban {
+      background: var(--err-bg);
+      color: var(--err);
+    }
+
+    .ref-list {
+      list-style: none;
+      font-size: 12.5px;
+    }
+
+    .ref-list li {
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    .ref-list .ref {
+      margin-right: 4px;
+    }
+
+    .ref-note {
+      color: var(--sub);
+      font-style: italic;
+      margin-top: 6px;
+      font-size: 12px;
+    }
+
+    .foot {
+      text-align: center;
+      font-size: 11px;
+      color: var(--sub);
+      padding: 12px;
+    }
+
+    /* ── MODAL (Ca #10) ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .15);
+    }
+
+    .modal-box h3 {
+      color: var(--err);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .modal-box p {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .modal-box .warn-items {
+      background: var(--err-bg);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin: 10px 0;
+      font-size: 12.5px;
+    }
+
+    .modal-box .warn-items div {
+      margin-bottom: 4px;
+    }
+
+    .modal-box label {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <h1>✈ Bay Mẫu · Trợ lý xử lý chuyến bay bị huỷ</h1>
+        <p>Prototype LAB5 Track 3 · Nhóm: Dương, Anhtu, Duy, Hùng · Dữ liệu giả lập 15:00 ngày 12/11/2026</p>
+      </div>
+      <div style="font-size:12px; opacity:0.85; background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px;">
+        Mã đặt chỗ: <strong>TRV-7Q2K</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="controls-inner">
+      <div class="ctrl-group">
+        <span class="ctrl-label">Mức tự chủ doi_chuyen_bay:</span>
+        <button class="lvl-btn" data-l="1">① Gợi ý</button>
+        <button class="lvl-btn on" data-l="2">② Xác nhận ✦</button>
+        <button class="lvl-btn" data-l="3">③ Tự đổi</button>
+      </div>
+      <div class="sep"></div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Tình huống:</span>
+        <button class="case-chip on" data-c="4">Mơ hồ "sáng mai"</button>
+        <button class="case-chip" data-c="11">#11 Thiếu chỗ BM217</button>
+        <button class="case-chip" data-c="10" id="triggerRefund">#10 Hoàn tiền</button>
+      </div>
+      <div class="sep"></div>
+      <label class="ctrl-check"><input type="checkbox" id="toggleRef" checked> Hiện ký hiệu HAX/PAIR</label>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="layout">
+
+    <!-- LEFT: CONVERSATION -->
+    <div class="conv-area" id="convArea">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- RIGHT: SIDEBAR -->
+    <div class="sidebar">
+      <div class="panel">
+        <div class="panel-head">Lời hứa thương hiệu ở mức này</div>
+        <div class="panel-body">
+          <div class="promise-text" id="promiseText"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Bảng mức tự chủ 5 tool</div>
+        <div class="panel-body">
+          <table class="tool-table">
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>Mức</th>
+                <th>Chi phí sai</th>
+              </tr>
+            </thead>
+            <tbody id="toolBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Chú thích HAX / PAIR</div>
+        <div class="panel-body">
+          <ul class="ref-list" id="refList"></ul>
+          <div class="ref-note" id="refNote"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">LAB5 · Track 3 Du lịch · File HTML độc lập, không gọi API, không gửi dữ liệu đi đâu.</div>
+
+  <!-- MODAL CA #10 -->
+  <div class="overlay" id="refundOverlay">
+    <div class="modal-box">
+      <h3>⚠ Xác nhận hoàn vé cho 2 hành khách</h3>
+      <p>Bạn đang yêu cầu hoàn vé đặt chỗ <b>TRV-7Q2K</b> cho Nguyễn Minh An và bé Nguyễn Gia Bình.</p>
+      <div class="warn-items">
+        <div>✕ <b>Gửi rồi không thể huỷ.</b> Bạn mất chỗ trên mọi chuyến thay thế.</div>
+        <div>⏳ Tiền hoàn về phương thức thanh toán gốc, xử lý có thể mất <b>tới 90 ngày</b>.</div>
+        <div>💰 Huỷ do bão: hoàn 100% tiền vé. <b>Không bồi thường tiền mặt.</b></div>
+      </div>
+      <label><input type="checkbox" id="refundCheck"> <b>Tôi hiểu yêu cầu này không thể rút lại</b></label>
+      <div class="btn-row">
+        <button class="action-btn action-danger" id="refundSend" disabled>Gửi yêu cầu hoàn vé</button>
+        <button class="action-btn action-secondary" id="refundCancel">Quay lại đổi chuyến</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    let LV = 2, CASE = 4, STATE = 'init', PICK = 'BM 201', timer = null, countdown = 0;
+
+    const FLIGHTS = [
+      { code: 'BM 201', time: '13/11 07:00', seats: 9, label: 'còn 9 chỗ', enough: true },
+      { code: 'BM 205', time: '13/11 09:30', seats: 4, label: 'còn 4 chỗ', enough: true },
+      { code: 'BM 217', time: '12/11 21:00', seats: 1, label: 'còn 1 chỗ — thiếu cho 2 HK', enough: false }
+    ];
+
+    function userBubble(t) { return `<div class="bubble bubble-user">${t}</div>`; }
+    function aiBubble(t) { return `<div class="bubble bubble-ai"><div class="sender">Trợ lý Bay Mẫu (AI)</div>${t}</div>`; }
+    function R(n) { return `<span class="ref" title="Xem chú thích ở sidebar">${n}</span>`; }
+
+    function flightCards(sel) {
+      return FLIGHTS.map(f => {
+        const isPicked = f.code === sel;
+        const cls = !f.enough ? 'no-go' : isPicked ? 'picked' : '';
+        let btn = '';
+        if (f.enough && LV >= 2 && STATE !== 'done') {
+          btn = `<button class="action-btn action-secondary" onclick="pickFlight('${f.code}')" ${isPicked ? 'disabled' : ''}>${isPicked ? 'Đang chọn' : 'Chọn'}</button>`;
+        } else if (!f.enough) {
+          btn = `<span class="seats-bad" style="font-size:11px">⛔ Không đủ 2 chỗ</span>`;
+        }
+        return `<div class="flight-row ${cls}">
+      <div><span class="code">${f.code}</span> · ${f.time}<br><span class="seats ${f.enough ? 'seats-ok' : 'seats-bad'}">${f.label}</span></div>
+      <div>${btn}</div>
+    </div>`;
+      }).join('');
+    }
+
+    function staffBtn() { return `<button class="action-btn action-staff" onclick="goState('staff')">${R('E')}Gặp nhân viên</button>`; }
+    function refundBtn() { return `<button class="action-btn action-secondary" onclick="$('#refundOverlay').classList.add('show')">Hoàn tiền thay vì đổi</button>`; }
+    function evidence() { return `<div class="evidence">${R('B')}Căn cứ: đặt chỗ TRV-7Q2K · chỗ trống tra lúc 15:00 · chính sách Bay Mẫu: đổi miễn phí <b>1 lần</b>/48h.</div>`; }
+
+    function render() {
+      clearInterval(timer);
+      let html = '';
+
+      // Context strip (always shown)
+      html += `<div class="ctx-strip">
+    <span class="tag">ĐÃ HUỶ DO BÃO</span>
+    <div><b>BM 213</b> · Hà Nội → TP.HCM · 12/11 lúc 19:00 · Hãng Bay Mẫu</div>
+    <div class="pax">2 hành khách: Nguyễn Minh An (34t) · bé Nguyễn Gia Bình (5t) — cần 2 chỗ &nbsp;|&nbsp; Mã đặt chỗ: <b>TRV-7Q2K</b></div>
+  </div>`;
+
+      // User message
+      const userMsgs = {
+        4: 'Chuyến bị huỷ rồi à? Vậy đổi giúp mình sang sáng mai nhé.',
+        11: 'Đổi sang chuyến 9 giờ tối nay đi.',
+        10: 'Thôi huỷ hết đi, hoàn tiền cho mình.'
+      };
+      html += userBubble(userMsgs[CASE]);
+
+      // Staff state
+      if (STATE === 'staff') {
+        html += aiBubble(`Mình đã chuyển cho nhân viên Bay Mẫu. Nhân viên nhận sẵn tóm tắt: đặt chỗ TRV-7Q2K, 2 hành khách, chuyến BM 213 bị huỷ do bão, yêu cầu khách đang xử lý. Thời gian chờ khoảng <b>3–5 phút</b>.
+      <div class="btn-row"><button class="action-btn action-secondary" onclick="goState('init')">← Quay lại</button></div>`);
+        $('#convArea').innerHTML = html; updateSidebar(); return;
+      }
+
+      // Refund confirmed
+      if (STATE === 'refunded') {
+        html += aiBubble(`<div class="done-card" style="background:var(--err-bg); border-color:var(--err-bd); text-align:left;">
+      <b>Đã tiếp nhận yêu cầu hoàn vé.</b> Mã tra cứu: <b>HT-7Q2K99</b>.<br>
+      Toàn bộ chỗ đã được giải phóng. Tiền hoàn về phương thức gốc, xử lý tối đa 90 ngày.
+    </div><div class="btn-row"><button class="action-btn action-secondary" onclick="goState('init')">Trải nghiệm lại</button></div>`);
+        $('#convArea').innerHTML = html; updateSidebar(); return;
+      }
+
+      // ── CASE 11: BM217 only 1 seat ──
+      if (CASE === 11) {
+        if (LV === 1) {
+          html += aiBubble(`${R('A')}Chuyến BM 217 (21:00) chỉ còn <b>1 chỗ</b>, đặt chỗ có <b>2 người</b>.
+        <span class="ambig-tag">⚠ Không đủ chỗ cho cả An và bé Bình</span>
+        <br>Các chuyến còn đủ chỗ:
+        ${flightCards('')}
+        ${evidence()}
+        <div class="btn-row"><button class="action-btn action-secondary">Mở trang Đổi lịch (bạn tự đổi)</button>${staffBtn()}</div>`);
+        } else if (LV === 2) {
+          if (STATE === 'done') {
+            html += aiBubble(`<div class="done-card"><div class="check">✓</div>Đã đổi sang <b>${PICK}</b> cho 2 hành khách. Lần đổi miễn phí đã dùng. Vé mới gửi về email.</div>
+          <div class="btn-row"><button class="action-btn action-secondary" onclick="goState('init')">Trải nghiệm lại</button></div>`);
+          } else {
+            const activePick = PICK === 'BM 217' ? 'BM 201' : PICK;
+            html += aiBubble(`
+          <div class="risk-card">${R('A')}<b>Không thể đổi sang BM 217:</b> chỉ còn <b>1 chỗ</b> mà cần <b>2</b>. Nếu đổi, bé Bình 5 tuổi sẽ bị rớt lại và mất lần đổi miễn phí duy nhất.</div>
+          ${R('C')}Hai chuyến sáng mai đủ chỗ cho cả mẹ và bé. Chị chọn chuyến nào?
+          ${flightCards(activePick)}
+          <div class="hold-card">
+            <div class="hold-label">${R('D')}Đã giữ chỗ tạm · chưa đổi vé</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+              <span>Giữ <b>${activePick}</b> cho 2 HK</span>
+              <span class="timer" id="tm">20:00</span>
+            </div>
+            <div style="font-size:12px;color:var(--warn);margin-top:4px;">Hết giờ → chỗ tự nhả, vé cũ và quyền đổi còn nguyên.</div>
+          </div>
+          <div class="confirm-card">
+            <b>Xác nhận đổi vé:</b> BM 213 → <b>${activePick}</b> · 2 HK · 0 đ · Dùng lần đổi miễn phí duy nhất.
+            <div class="btn-row">
+              <button class="action-btn action-confirm" onclick="PICK='${activePick}';goState('done')">Xác nhận đổi</button>
+              <button class="action-btn action-secondary" onclick="pickFlight('${activePick === 'BM 201' ? 'BM 205' : 'BM 201'}')">${R('F')}Chọn chuyến khác</button>
+              ${staffBtn()}
+            </div>
+          </div>
+          ${evidence()}
+          <div class="btn-row" style="margin-top:6px;">${refundBtn()}</div>
+        `);
+          }
+        } else {
+          // LV 3: auto-exchange BM217 → catastrophe
+          if (STATE === 'undone') {
+            html += aiBubble(`Đã hoàn tác. Vé quay về chuyến BM 213 (bị huỷ). Lần đổi miễn phí còn nguyên. Chọn chuyến khác:
+          ${flightCards('')}
+          <div class="btn-row">${staffBtn()}</div>`);
+          } else {
+            html += aiBubble(`
+          <div class="risk-card" style="font-size:13px;">
+            <b>⚡ AI đã tự đổi sang BM 217 (21:00).</b><br>
+            ⚠ <b>LỖI:</b> Chuyến chỉ còn 1 chỗ → chỉ đổi được cho An, bé Bình (5 tuổi) bị kẹt lại. Lần đổi miễn phí duy nhất đã mất.
+          </div>
+          <div class="undo-card">
+            ${R('D')}<b>Hoàn tác trong <span class="timer" id="tm">10:00</span></b> — sau đó vé chốt, không cứu được.
+            <div class="btn-row">
+              <button class="action-btn action-danger" onclick="goState('undone')">Hoàn tác ngay</button>
+              ${staffBtn()}
+            </div>
+          </div>
+          <div class="risk-card" style="margin-top:8px;">
+            <b>Bài học:</b> Mức ③ (tự đổi) ở ca này gây ra hậu quả nghiêm trọng nhất: chia cắt mẹ và bé 5 tuổi, tiêu tốn lần đổi duy nhất, khách không kịp đọc thì 10 phút hoàn tác cũng vô dụng.
+          </div>
+        `);
+          }
+        }
+      }
+
+      // ── CASE 4: ambiguous "sáng mai" ──
+      else {
+        if (LV === 1) {
+          html += aiBubble(`Chuyến BM 213 bị huỷ do bão. Bạn được đổi miễn phí 1 lần trong 48h.
+        <span class="ambig-tag">${R('A')}Chưa rõ: "sáng mai" có 2 chuyến (07:00 và 09:30)</span>
+        ${flightCards('')}
+        ${evidence()}
+        <div class="btn-row"><button class="action-btn action-secondary">Mở trang Đổi lịch (bạn tự chọn)</button>${staffBtn()}</div>`);
+        } else if (LV === 2) {
+          if (STATE === 'done') {
+            html += aiBubble(`<div class="done-card"><div class="check">✓</div>Đã đổi sang <b>${PICK}</b> cho 2 hành khách. Lần đổi miễn phí đã dùng. Vé mới gửi về email.</div>
+          <div class="btn-row"><button class="action-btn action-secondary" onclick="goState('init')">Trải nghiệm lại</button></div>`);
+          } else {
+            html += aiBubble(`
+          Chuyến BM 213 đã bị huỷ do bão.
+          <span class="ambig-tag">${R('A')}Chưa rõ: "sáng mai" — có BM 201 (07:00) và BM 205 (09:30)</span>
+          <div style="margin-top:4px;">${R('C')}Bạn muốn bay chuyến nào, và đổi cho <b>cả 2 người</b> chứ?</div>
+          ${flightCards(PICK)}
+          <div class="hold-card">
+            <div class="hold-label">${R('D')}Đã giữ chỗ tạm · chưa đổi vé</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+              <span>Giữ <b>${PICK}</b> cho 2 HK</span>
+              <span class="timer" id="tm">20:00</span>
+            </div>
+            <div style="font-size:12px;color:var(--warn);margin-top:4px;">Hết giờ → chỗ tự nhả, vé cũ và quyền đổi còn nguyên.</div>
+          </div>
+          <div class="confirm-card">
+            <b>Xác nhận đổi vé:</b> BM 213 → <b>${PICK}</b> · 2 HK · 0 đ · Dùng lần đổi miễn phí duy nhất.
+            <div class="btn-row">
+              <button class="action-btn action-confirm" onclick="goState('done')">Xác nhận đổi</button>
+              <button class="action-btn action-secondary" onclick="pickFlight(PICK==='BM 201'?'BM 205':'BM 201')">${R('F')}Chọn chuyến ${PICK === 'BM 201' ? '09:30' : '07:00'}</button>
+              ${staffBtn()}
+            </div>
+          </div>
+          ${evidence()}
+          <div class="btn-row" style="margin-top:6px;">${refundBtn()}</div>
+        `);
+          }
+        } else {
+          // LV 3
+          if (STATE === 'undone') {
+            html += aiBubble(`Đã hoàn tác. Vé quay về trạng thái chuyến bị huỷ, lần đổi miễn phí vẫn còn. Chọn chuyến khác:
+          ${flightCards('')}
+          <div class="btn-row">${staffBtn()}</div>`);
+          } else {
+            html += aiBubble(`
+          Chuyến BM 213 bị huỷ. Mình đã <b>tự động đổi sang ${PICK} · ${FLIGHTS.find(f => f.code === PICK).time}</b> cho 2 hành khách — chuyến sớm nhất đủ chỗ.
+          ${evidence()}
+          <div class="undo-card">
+            ${R('D')}<b>Đã đổi vé. Hoàn tác trong <span class="timer" id="tm">10:00</span></b> — sau đó vé chốt chính thức.
+            <div class="btn-row">
+              <button class="action-btn action-secondary" onclick="goState('undone')">Hoàn tác</button>
+              <button class="action-btn action-secondary" onclick="goState('undone')">${R('F')}Sai rồi, mình muốn 09:30</button>
+              ${staffBtn()}
+            </div>
+          </div>
+          <div class="risk-card">
+            <b>Rủi ro Mức ③:</b> Khách nói "sáng mai" nhưng AI tự chọn 07:00. Nếu khách có bé 5 tuổi chưa dậy kịp, khách muốn 09:30 nhưng lượt đổi duy nhất đã mất. Hoàn tác 10 phút chỉ có tác dụng khi khách đọc tin kịp.
+          </div>
+        `);
+          }
+        }
+      }
+
+      $('#convArea').innerHTML = html;
+      updateSidebar();
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      const tm = $('#tm');
+      if (!tm) return;
+      countdown = LV === 2 ? 1200 : 600;
+      timer = setInterval(() => {
+        countdown--;
+        const m = String(Math.floor(countdown / 60)).padStart(2, '0');
+        const s = String(countdown % 60).padStart(2, '0');
+        if (tm) tm.textContent = m + ':' + s;
+        if (countdown <= 0) { clearInterval(timer); if (LV === 2) alert('Hết 20 phút — chỗ giữ đã tự nhả.'); }
+      }, 1000);
+    }
+
+    function updateSidebar() {
+      // Promise
+      const promises = {
+        1: '"Mình cho bạn biết lựa chọn, bạn tự đổi." An toàn nhất cho hệ thống, nhưng khách vội phải bấm qua nhiều bước và chuyến tốt có thể bị hết chỗ.',
+        2: '"Mình giữ chỗ ngay; bạn bấm xác nhận thì mình mới đổi." Việc rẻ (giữ 20 phút, tự nhả) thì AI tự làm; việc đắt (đổi vé, mất lượt miễn phí) thì chờ khách duyệt. <b>Mức nhóm chọn.</b>',
+        3: '"Mình đổi luôn, sai thì hoàn tác." Nhanh nhất, nhưng AI quyết thay khách khi câu nói mơ hồ. Rất nguy hiểm khi chuyến thiếu chỗ hoặc khách không đọc thông báo kịp.'
+      };
+      $('#promiseText').innerHTML = promises[LV];
+
+      // Tool table
+      const lvInfo = { 1: ['Gợi ý', 'pill-sug'], 2: ['Cần xác nhận', 'pill-ask'], 3: ['Tự đổi + hoàn tác', 'pill-auto'] }[LV];
+      const lvReason = { 1: 'Khách tự đổi trên web, AI không can thiệp.', 2: 'Mất lần đổi duy nhất nếu sai → 1 bước xác nhận chặn được; giữ chỗ 20p bảo vệ cơ hội.', 3: 'AI tự đổi ngay; quá liều khi khách nói mơ hồ hoặc chuyến thiếu chỗ.' }[LV];
+      const tools = [
+        ['tra_cuu_dat_cho', 'Tự làm', 'pill-auto', 'Chỉ đọc, không ảnh hưởng quyền lợi.'],
+        ['giu_cho_chuyen_moi', LV === 1 ? 'Không dùng' : 'Tự làm có ĐK', LV === 1 ? 'pill-sug' : 'pill-auto', '20 phút tự nhả; chờ người thì hết chỗ.'],
+        ['doi_chuyen_bay', lvInfo[0], lvInfo[1], lvReason, true],
+        ['gui_yeu_cau_hoan_ve', 'Cần xác nhận', 'pill-ask', 'Gửi rồi không huỷ được → cần cảnh báo + checkbox.'],
+        ['chuyen_nhan_vien', 'Tự làm có ĐK', 'pill-auto', 'Ngoài thẩm quyền / lỗi / khách yêu cầu → tự chuyển.']
+      ];
+      $('#toolBody').innerHTML = tools.map(r => `<tr class="${r[4] ? 'hl' : ''}"><td><code>${r[0]}</code></td><td><span class="pill ${r[2]}">${r[1]}</span></td><td>${r[3]}</td></tr>`).join('');
+
+      // Ref list
+      const allRefs = [
+        ['A', 'HAX G2 · Nói rõ giới hạn', 'Nhãn "Chưa rõ" hoặc "Không đủ chỗ": AI thừa nhận chỗ mơ hồ thay vì tự tin sai.'],
+        ['B', 'HAX G11 + Explainability', 'Dòng căn cứ: TRV-7Q2K, chỗ trống lúc 15:00, chính sách 1 lần đổi/48h.'],
+        ['C', 'HAX G10 · Hỏi lại khi nghi ngờ', 'Hỏi cụ thể "chuyến nào, cho cả 2 người chứ?" thay vì đoán mò.'],
+        ['D', 'HAX G8/G9 + Feedback', 'Đếm ngược 20 phút giữ chỗ (Mức ②) hoặc 10 phút hoàn tác (Mức ③).'],
+        ['E', 'PAIR Graceful Failure', 'Nút "Gặp nhân viên" ở mọi bước, tự đóng gói tóm tắt gửi nhân viên.'],
+        ['F', 'HAX G9 · Sửa dễ', 'Nút đổi chuyến khác ngay trên thẻ, không phải bắt đầu lại.']
+      ];
+      const show = { 1: ['A', 'B', 'E'], 2: ['A', 'B', 'C', 'D', 'E', 'F'], 3: ['B', 'D', 'E', 'F'] }[LV];
+      $('#refList').innerHTML = allRefs.filter(r => show.includes(r[0])).map(r => `<li>${R(r[0])}<b>${r[1]}</b> — ${r[2]}</li>`).join('');
+      const notes = { 1: 'Mức ① không có C, D, F: AI không giữ chỗ, không đổi → không có gì để xác nhận hay hoàn tác.', 2: '', 3: 'Mức ③ mất A và C: AI không thừa nhận mơ hồ và không hỏi lại — đó là chỗ nó bị quá liều.' }[LV];
+      $('#refNote').innerHTML = notes;
+    }
+
+    function pickFlight(code) { PICK = code; STATE = 'init'; render(); }
+    function goState(s) { STATE = s; render(); }
+
+    // Controls wiring
+    $$('.lvl-btn').forEach(b => b.onclick = () => {
+      $$('.lvl-btn').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      LV = +b.dataset.l;
+      STATE = 'init'; PICK = CASE === 11 ? 'BM 201' : 'BM 201';
+      render();
+    });
+    $$('.case-chip[data-c]').forEach(b => {
+      if (b.id === 'triggerRefund') {
+        b.onclick = () => { $('#refundOverlay').classList.add('show'); };
+        return;
+      }
+      b.onclick = () => {
+        $$('.case-chip').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        CASE = +b.dataset.c;
+        STATE = 'init'; PICK = 'BM 201';
+        render();
+      };
+    });
+    $('#toggleRef').onchange = e => document.body.classList.toggle('no-ref', !e.target.checked);
+    $('#refundCheck').onchange = e => $('#refundSend').disabled = !e.target.checked;
+    $('#refundCancel').onclick = () => $('#refundOverlay').classList.remove('show');
+    $('#refundSend').onclick = () => { $('#refundOverlay').classList.remove('show'); STATE = 'refunded'; render(); };
+
+    // Init
+    render();
+  </script>
+
+</body>
+
+</html>
