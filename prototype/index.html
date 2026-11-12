@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype T3 · Ca #11 "đổi sang chuyến 9h tối đi"</title>
+<style>
+:root{--ink:#1f2328;--mut:#6b7280;--line:#e5e7eb;--bg:#f6f7f9;--card:#fff;--ai:#eef2ff;--user:#dcfce7;--warn:#fef3c7;--bad:#b42318;--ok:#067647;--acc:#1d4ed8}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.45 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{display:flex;gap:24px;max-width:1100px;margin:0 auto;padding:16px;align-items:flex-start;flex-wrap:wrap}
+.phone{width:420px;max-width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.top{padding:12px 14px;border-bottom:1px solid var(--line);background:#fff}
+.top .t1{font-weight:700}
+.top .t2{font-size:13px;color:var(--mut)}
+.booking{margin-top:8px;font-size:13px;background:var(--bg);border-radius:10px;padding:8px 10px}
+.booking b{font-weight:600}
+.cancel{color:var(--bad);font-weight:600}
+.chat{padding:12px;height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;background:#fcfcfd}
+.msg{max-width:92%;padding:9px 11px;border-radius:12px;white-space:pre-wrap}
+.msg.ai{background:var(--ai);align-self:flex-start}
+.msg.user{background:var(--user);align-self:flex-end}
+.who{font-size:11px;color:var(--mut);margin-bottom:2px}
+.chip{display:inline-block;font-size:11px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:1px 8px;margin:0 4px 4px 0;color:var(--mut)}
+.chip.auto{border-color:#a7f3d0;color:var(--ok)}
+.chip.appr{border-color:#fcd34d;color:#92400e}
+.basis{font-size:12px;color:var(--mut);margin-top:6px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;align-self:stretch}
+.card h4{margin:0 0 6px;font-size:14px}
+.fl{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px}
+.fl.dim{opacity:.45;background:#f3f4f6}
+.fl .meta{font-size:12px;color:var(--mut)}
+.fl .need{font-size:12px;font-weight:600}
+.fl .need.bad{color:var(--bad)}
+.fl .need.ok{color:var(--ok)}
+button{font:inherit;border-radius:9px;border:1px solid var(--line);background:#fff;padding:6px 10px;cursor:pointer}
+button.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.hold{background:var(--warn);border:1px solid #fcd34d;border-radius:10px;padding:8px 10px;margin-top:6px;font-size:14px}
+.cd{font-variant-numeric:tabular-nums;font-weight:700}
+.warn{background:var(--warn);border-radius:8px;padding:6px 8px;font-size:13px;margin:6px 0}
+.sum{font-size:13px;background:var(--bg);border-radius:8px;padding:8px;margin-top:6px}
+.side{flex:1;min-width:300px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.panel h3{margin:0 0 8px;font-size:15px}
+.legend{list-style:none;padding:0;margin:0}
+.legend li{display:flex;gap:8px;padding:5px 4px;border-radius:8px;font-size:13px}
+.legend li:hover{background:var(--bg)}
+.n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#111827;color:#fff;font-size:11px;font-weight:700;flex:none;margin-left:4px;vertical-align:middle}
+.n.hl{background:#dc2626;outline:3px solid #fecaca}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left}
+.lv-auto{color:var(--ok);font-weight:600}.lv-appr{color:#92400e;font-weight:600}
+.small{font-size:12px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="phone">
+    <div class="top">
+      <div class="t1">Đặt chỗ của tôi <span class="n" data-n="1">1</span></div>
+      <div class="t2">Trợ lý AI của Bay Mẫu (bạn đang trò chuyện với AI)</div>
+      <div class="booking">
+        <b>TRV-7Q2K</b> · Nguyễn Minh An + bé Nguyễn Gia Bình (5 tuổi)<br>
+        Chuyến gốc BM213 Hà Nội → TP.HCM, 12/11 19:00 · <span class="cancel">ĐÃ HUỶ do bão</span>
+      </div>
+    </div>
+    <div class="chat" id="chat"></div>
+  </div>
+
+  <div class="side">
+    <div class="panel">
+      <h3>Chú thích chỗ đánh số (ca #11 · khách xác nhận mơ hồ)</h3>
+      <ul class="legend" id="legend">
+        <li data-n="1"><span class="n">1</span><span><b>G10</b> · AI hỏi lại thay vì đổi theo lời khách "đổi sang chuyến 9h tối đi"</span></li>
+        <li data-n="2"><span class="n">2</span><span><b>G2</b> · Chuyến BM217 bị làm mờ, ghi rõ "còn 1 chỗ, cần 2 chỗ"</span></li>
+        <li data-n="3"><span class="n">3</span><span><b>G11</b> · Dòng "Dựa trên dữ liệu lúc 15:00" và lý do chưa đổi (không mất lượt miễn phí duy nhất)</span></li>
+        <li data-n="4"><span class="n">4</span><span><b>Tự làm</b> · Giữ chỗ 20 phút, có đếm ngược và nút "Nhả chỗ" (hoàn tác); hết giờ tự nhả</span></li>
+        <li data-n="5"><span class="n">5</span><span><b>Cần duyệt</b> · Thẻ xác nhận đổi: chỉ nút "Xác nhận đổi" mới chạy <code>doi_chuyen_bay</code></span></li>
+        <li data-n="6"><span class="n">6</span><span><b>Chuyển người</b> · Nút "Nói chuyện với nhân viên" kèm tóm tắt cho nhân viên</span></li>
+        <li data-n="7"><span class="n">7</span><span><b>Việc cấm</b> · Không có nút bồi thường tiền mặt / đổi tên người bay; chỉ nhân viên</span></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Mức tự chủ của 5 tool (§4)</h3>
+      <table>
+        <tr><th>Tool</th><th>Mức</th></tr>
+        <tr><td><code>tra_cuu_dat_cho</code></td><td class="lv-auto">tự làm</td></tr>
+        <tr><td><code>giu_cho_chuyen_moi</code></td><td class="lv-auto">tự làm</td></tr>
+        <tr><td><code>doi_chuyen_bay</code></td><td class="lv-appr">cần khách duyệt</td></tr>
+        <tr><td><code>gui_yeu_cau_hoan_ve</code></td><td class="lv-appr">cần khách duyệt</td></tr>
+        <tr><td><code>chuyen_nhan_vien</code></td><td class="lv-auto">tự làm</td></tr>
+      </table>
+      <p class="small">Dữ liệu dựng của track T3. Không có AI thật, không có dữ liệu thật.</p>
+    </div>
+    <div class="panel">
+      <h3>Công cụ demo</h3>
+      <div class="row">
+        <button id="ff">Tua nhanh đếm ngược (còn 5 giây)</button>
+        <button id="reset">Làm lại từ đầu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var NEED = 2;
+  var FLIGHTS = [
+    {id:'BM217', time:'12/11 · 21:00', seats:1},
+    {id:'BM201', time:'13/11 · 07:00', seats:9},
+    {id:'BM205', time:'13/11 · 09:30', seats:4}
+  ];
+  var chat = document.getElementById('chat');
+  var hold = null;      // {id, remaining, timer, confirmEl}
+  var done = false;
+  var holdBtns = [];
+
+  function badge(n){ return '<span class="n" data-n="'+n+'">'+n+'</span>'; }
+  function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+  function fmt(s){ var m=Math.floor(s/60), r=s%60; return (m<10?'0':'')+m+':'+(r<10?'0':'')+r; }
+
+  function addUser(text){
+    var d=document.createElement('div'); d.className='msg user';
+    d.innerHTML='<div class="who">Chị An</div>'+text;
+    chat.appendChild(d); scrollDown();
+  }
+  function addAI(html){
+    var d=document.createElement('div'); d.className='msg ai';
+    d.innerHTML='<div class="who">Trợ lý AI</div>'+html;
+    chat.appendChild(d); scrollDown(); return d;
+  }
+  function addCard(html){
+    var d=document.createElement('div'); d.className='card'; d.innerHTML=html;
+    chat.appendChild(d); scrollDown(); return d;
+  }
+
+  function setHoldButtonsDisabled(flag){
+    holdBtns.forEach(function(b){ b.disabled = flag; });
+  }
+
+  function start(){
+    if(hold && hold.timer) clearInterval(hold.timer);
+    hold=null; done=false; holdBtns=[]; chat.innerHTML='';
+    addUser('đổi sang chuyến 9h tối đi');
+    addAI(
+      '<span class="chip auto">tra_cuu_dat_cho · tự làm</span><br>'+
+      'BM217 21:00 hôm nay chỉ còn <b>1 chỗ</b>, mà chị và bé Bình cần <b>2 chỗ</b>, nên mình chưa đổi để không mất lần đổi miễn phí duy nhất. '+
+      'Hai chuyến sáng mai còn đủ chỗ cho cả hai: BM201 07:00 (còn 9 chỗ), BM205 09:30 (còn 4 chỗ). '+
+      'Chị chọn chuyến nào, mình giữ chỗ 20 phút (chưa đổi vé) để chị xác nhận ạ? '+badge(1)+
+      '<div class="basis">Dựa trên: dữ liệu chỗ trống lúc 15:00 · đặt chỗ TRV-7Q2K '+badge(3)+'</div>'
+    );
+    var html='<h4>Chọn chuyến thay thế (cần '+NEED+' chỗ)</h4>';
+    FLIGHTS.forEach(function(f){
+      var enough = f.seats >= NEED;
+      html += '<div class="fl'+(enough?'':' dim')+'">'+
+        '<div><b>'+f.id+'</b> · '+f.time+'<div class="meta">còn '+f.seats+' chỗ</div></div>'+
+        (enough
+          ? '<div><span class="need ok">đủ chỗ</span><br><button class="hold-btn" data-id="'+f.id+'">Giữ chỗ 20 phút</button></div>'
+          : '<div><span class="need bad">không đủ: còn '+f.seats+', cần '+NEED+'</span> '+badge(2)+'</div>')+
+        '</div>';
+    });
+    html += '<div class="row"><button class="staff-btn">Nói chuyện với nhân viên</button> '+badge(6)+'</div>';
+    html += '<div class="basis">Không có nút bồi thường tiền mặt hay đổi tên người bay: các việc này chỉ nhân viên xử lý '+badge(7)+'</div>';
+    var card = addCard(html);
+    card.querySelectorAll('.hold-btn').forEach(function(b){
+      holdBtns.push(b);
+      b.addEventListener('click', function(){ holdSeat(b.getAttribute('data-id')); });
+    });
+    card.querySelector('.staff-btn').addEventListener('click', handoff);
+    wireLegend();
+  }
+
+  function holdSeat(id){
+    if(hold || done) return;
+    var f = FLIGHTS.filter(function(x){return x.id===id;})[0];
+    addUser('Giữ chỗ '+id+' giúp mình');
+    var msg = addAI(
+      '<span class="chip auto">giu_cho_chuyen_moi · tự làm</span><br>'+
+      'Mình đã giữ '+NEED+' chỗ trên <b>'+id+'</b> ('+f.time+'). <b>Chưa đổi vé</b>, lượt đổi miễn phí còn nguyên.'+
+      '<div class="hold">Giữ chỗ còn <span class="cd">20:00</span> (giữ đến 15:20) '+badge(4)+
+      '<div class="row"><button class="release-btn">Nhả chỗ</button></div></div>'
+    );
+    hold = {id:id, remaining:1200, timer:null, confirmEl:null, msg:msg};
+    setHoldButtonsDisabled(true);
+
+    var confirm = addCard(
+      '<span class="chip appr">doi_chuyen_bay · cần khách duyệt</span> '+badge(5)+
+      '<h4>Xác nhận đổi chuyến</h4>'+
+      '<div class="sum">Chuyến mới: <b>'+id+'</b> · '+f.time+'<br>'+
+      'Hành khách: Nguyễn Minh An, Nguyễn Gia Bình (2 người)<br>'+
+      'Chỗ còn lại: '+f.seats+' (đủ cho 2)<br>'+
+      'Chuyến gốc: BM213 (đã huỷ)</div>'+
+      '<div class="warn">Đổi vé sẽ <b>dùng lần đổi miễn phí duy nhất</b> của đặt chỗ này và khó đảo lại.</div>'+
+      '<div class="row"><button class="primary confirm-btn">Xác nhận đổi</button>'+
+      '<button class="cancel-btn">Huỷ giữ chỗ</button>'+
+      '<button class="staff-btn2">Nói chuyện với nhân viên</button></div>'
+    );
+    hold.confirmEl = confirm;
+    msg.querySelector('.release-btn').addEventListener('click', function(){ release('Đã nhả chỗ theo yêu cầu của chị.'); });
+    confirm.querySelector('.confirm-btn').addEventListener('click', confirmChange);
+    confirm.querySelector('.cancel-btn').addEventListener('click', function(){ release('Đã huỷ giữ chỗ.'); });
+    confirm.querySelector('.staff-btn2').addEventListener('click', handoff);
+
+    hold.timer = setInterval(function(){
+      if(!hold) return;
+      hold.remaining--;
+      updateCountdown();
+      if(hold.remaining<=0){ release('Hết 20 phút, chỗ đã tự nhả.'); }
+    }, 1000);
+    wireLegend();
+  }
+
+  function updateCountdown(){
+    if(!hold) return;
+    var els = chat.querySelectorAll('.cd');
+    if(els.length){ els[els.length-1].textContent = fmt(Math.max(hold.remaining,0)); }
+  }
+
+  function lockHoldUI(){
+    if(!hold) return;
+    if(hold.msg){ hold.msg.querySelectorAll('button').forEach(function(b){b.disabled=true;}); }
+    if(hold.confirmEl){ hold.confirmEl.querySelectorAll('button').forEach(function(b){b.disabled=true;}); }
+  }
+
+  function release(text){
+    if(!hold) return;
+    clearInterval(hold.timer);
+    lockHoldUI();
+    hold=null;
+    setHoldButtonsDisabled(false);
+    addAI(text+' <b>Chưa đổi vé gì, lượt đổi miễn phí còn nguyên.</b> Chị có thể chọn lại chuyến khác.');
+  }
+
+  function confirmChange(){
+    if(!hold) return;
+    var id = hold.id;
+    var f = FLIGHTS.filter(function(x){return x.id===id;})[0];
+    clearInterval(hold.timer);
+    lockHoldUI();
+    hold=null; done=true;
+    setHoldButtonsDisabled(true);
+    addAI(
+      '<span class="chip appr">doi_chuyen_bay · khách đã xác nhận</span><br>'+
+      'Đã đổi chuyến cho cả chị An và bé Bình sang <b>'+id+'</b> ('+f.time+'). Lần đổi miễn phí duy nhất của đặt chỗ này đã được dùng. '+
+      'Vé mới sẽ gửi cho chị sau khi hệ thống xử lý xong.'
+    );
+  }
+
+  function handoff(){
+    addUser('Cho mình nói chuyện với nhân viên');
+    addAI(
+      '<span class="chip auto">chuyen_nhan_vien · tự làm</span><br>'+
+      'Mình đã chuyển nhân viên hỗ trợ. Nhân viên nhận được tóm tắt dưới đây, chị không cần kể lại.'+
+      '<div class="sum"><b>Tóm tắt cho nhân viên</b><br>'+
+      'Đặt chỗ: TRV-7Q2K · 2 hành khách (An, bé Bình 5 tuổi)<br>'+
+      'Chuyến gốc BM213 đã huỷ do bão<br>'+
+      'Khách muốn: BM217 21:00 · chỉ còn 1 chỗ, cần 2<br>'+
+      'Chưa đổi vé, chưa gửi yêu cầu hoàn'+(hold?'<br>Đang giữ chỗ '+hold.id+' (còn '+fmt(hold.remaining)+')':'')+'</div> '+badge(6)
+    );
+    wireLegend();
+  }
+
+  // Highlight badges when hovering the legend
+  function wireLegend(){
+    var items = document.querySelectorAll('#legend li');
+    items.forEach(function(li){
+      li.onmouseenter = function(){
+        var n = li.getAttribute('data-n');
+        document.querySelectorAll('.phone .n[data-n="'+n+'"]').forEach(function(b){b.classList.add('hl');});
+      };
+      li.onmouseleave = function(){
+        document.querySelectorAll('.phone .n.hl').forEach(function(b){b.classList.remove('hl');});
+      };
+    });
+  }
+
+  document.getElementById('ff').addEventListener('click', function(){
+    if(hold){ hold.remaining = 5; updateCountdown(); }
+  });
+  document.getElementById('reset').addEventListener('click', start);
+
+  start();
+})();
+</script>
+</body>
+</html>

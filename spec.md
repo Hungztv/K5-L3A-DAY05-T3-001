@@ -200,3 +200,69 @@ Mức nào cũng có giá, trỏ về kịch bản ở §2:
 | **#10** hoàn vé | Có: `gui_yeu_cau_hoan_ve` chỉ chạy sau khi khách bấm "Xác nhận gửi yêu cầu hoàn tiền" trên thẻ cảnh báo | Không: AI chỉ hiển thị thẻ cảnh báo kèm hai lựa chọn khác ("Xem chuyến bay thay thế", "Nói chuyện với nhân viên") | Khách thật sự muốn hoàn mất thêm một lượt bấm, chấp nhận được vì hoàn xử lý tới 90 ngày |
 | **#11** đổi sang chuyến 1 chỗ | Có: `doi_chuyen_bay` bị chặn vì số chỗ (1) nhỏ hơn số hành khách (2), lượt miễn phí còn nguyên | Không: AI hỏi khách chọn chuyến đủ chỗ trước khi giữ chỗ | Khách phải chọn một trong hai chuyến sáng mai, đáng vì thực sự có hai lựa chọn |
 | **#3** "Chuyến của mình mấy giờ bay vậy?" (bình thường) | Không có gì để chặn: `tra_cuu_dat_cho` chỉ đọc | Không | Không: tra cứu tự làm, trả lời ngay |
+
+
+## §5. Prototype  (chặng 5)
+
+- **File:** `prototype/index.html` (mở bằng trình duyệt, không cần cài gì). Ảnh có đánh số: `prototype/man1.png`, `prototype/man2.png`.
+- **Công cụ:** một file HTML thuần (HTML, CSS, JavaScript), viết có sự hỗ trợ của AI.
+- **Phần mock:** toàn bộ. Dữ liệu là dữ liệu dựng của track T3 (đặt chỗ TRV-7Q2K, BM217 còn 1 chỗ, BM201 còn 9 chỗ, BM205 còn 4 chỗ). Không có backend, không đăng nhập.
+- **Lời gọi AI thật:** không có. Câu AI nói là câu đã viết ở §3.
+- **Ca được dựng:** kịch bản #11, khách nhắn "đổi sang chuyến 9h tối đi" (khách xác nhận mơ hồ). Đây không phải ca "đổi sang sáng mai" của giảng viên.
+
+### Ảnh đánh số
+
+| Số | Chỗ trên màn hình | Thể hiện gì | Nguyên tắc | Mức tự chủ |
+|---|---|---|---|---|
+| 1 | Câu AI hỏi lại ở đầu cuộc trò chuyện | AI không đổi theo lời khách, hỏi khách chọn chuyến nào | G10 | |
+| 2 | Chuyến BM217 bị làm mờ, "không đủ: còn 1, cần 2" | Chỉ ra giới hạn bằng số cụ thể | G2 | |
+| 3 | Dòng "Dựa trên: dữ liệu chỗ trống lúc 15:00 · đặt chỗ TRV-7Q2K" và lý do chưa đổi | Cho khách thấy căn cứ để tự kiểm | G11 | |
+| 4 | Khung "Giữ chỗ còn 20:00" có nút "Nhả chỗ" | Giữ chỗ chưa đổi vé, hoàn tác được, hết giờ tự nhả | | tự làm (`giu_cho_chuyen_moi`) |
+| 5 | Thẻ "Xác nhận đổi chuyến" (chuyến mới, 2 hành khách, số chỗ, cảnh báo lượt miễn phí) | Chỉ nút "Xác nhận đổi" mới chạy đổi vé | | cần khách duyệt (`doi_chuyen_bay`) |
+| 6 | Nút "Nói chuyện với nhân viên" và thẻ tóm tắt cho nhân viên | Đường chuyển người, nhân viên không phải hỏi lại | | tự làm (`chuyen_nhan_vien`) |
+| 7 | Dòng "Không có nút bồi thường tiền mặt hay đổi tên người bay" | Việc cấm không có nút làm | | cấm |
+
+### Quyết định về cách hiện
+
+**Cách hiện độ chắc và bằng chứng: chọn hiện số liệu cụ thể và căn cứ, không hiện phần trăm tin cậy.**
+- Lỗi ở #11 là dữ liệu chỗ trống, nên khách cần thấy "còn 1 chỗ, cần 2" và "dữ liệu lúc 15:00" để tự kiểm.
+- Đã loại thanh phần trăm tin cậy: một con số % không cho khách biết sai ở đâu và kiểm bằng cách nào.
+- Đã loại banner chung "AI có thể sai": không chỉ ra chỗ nào cần kiểm.
+
+**Cách điều khiển mức tự chủ: tách hai bước, giữ chỗ (tự làm, có đếm ngược và nút nhả) rồi mới xác nhận đổi (cần khách duyệt).**
+- Giữ chỗ 20 phút bảo vệ khách trong lúc cân nhắc, nên một lượt xác nhận không làm khách mất chuyến.
+- Đã loại một nút "Đổi ngay" kèm hộp thoại "Bạn chắc chứ?": không bảo vệ chỗ trong lúc khách cân nhắc và dễ bị bấm lướt.
+- Đã loại "chỉ nhân viên đổi": khách gấp phải chờ người, chuyến sáng mai có thể hết chỗ.
+
+
+## §5. Prototype  (chặng 5)
+
+- **File:** `prototype/index.html` (mở bằng trình duyệt, không cần cài gì). Ảnh có đánh số: `prototype/man1.png`, `prototype/man2.png`.
+- **Công cụ:** một file HTML thuần (HTML, CSS, JavaScript), viết có sự hỗ trợ của AI.
+- **Phần mock:** toàn bộ. Dữ liệu là dữ liệu dựng của track T3 (đặt chỗ TRV-7Q2K, BM217 còn 1 chỗ, BM201 còn 9 chỗ, BM205 còn 4 chỗ). Không có backend, không đăng nhập.
+- **Lời gọi AI thật:** không có. Câu AI nói là câu đã viết ở §3.
+- **Ca được dựng:** kịch bản #11, khách nhắn "đổi sang chuyến 9h tối đi" (khách xác nhận mơ hồ). Đây không phải ca "đổi sang sáng mai" của giảng viên.
+
+### Ảnh đánh số
+
+| Số | Chỗ trên màn hình | Thể hiện gì | Nguyên tắc | Mức tự chủ |
+|---|---|---|---|---|
+| 1 | Câu AI hỏi lại ở đầu cuộc trò chuyện | AI không đổi theo lời khách, hỏi khách chọn chuyến nào | G10 | |
+| 2 | Chuyến BM217 bị làm mờ, "không đủ: còn 1, cần 2" | Chỉ ra giới hạn bằng số cụ thể | G2 | |
+| 3 | Dòng "Dựa trên: dữ liệu chỗ trống lúc 15:00 · đặt chỗ TRV-7Q2K" và lý do chưa đổi | Cho khách thấy căn cứ để tự kiểm | G11 | |
+| 4 | Khung "Giữ chỗ còn 20:00" có nút "Nhả chỗ" | Giữ chỗ chưa đổi vé, hoàn tác được, hết giờ tự nhả | | tự làm (`giu_cho_chuyen_moi`) |
+| 5 | Thẻ "Xác nhận đổi chuyến" (chuyến mới, 2 hành khách, số chỗ, cảnh báo lượt miễn phí) | Chỉ nút "Xác nhận đổi" mới chạy đổi vé | | cần khách duyệt (`doi_chuyen_bay`) |
+| 6 | Nút "Nói chuyện với nhân viên" và thẻ tóm tắt cho nhân viên | Đường chuyển người, nhân viên không phải hỏi lại | | tự làm (`chuyen_nhan_vien`) |
+| 7 | Dòng "Không có nút bồi thường tiền mặt hay đổi tên người bay" | Việc cấm không có nút làm | | cấm |
+
+### Quyết định về cách hiện
+
+**Cách hiện độ chắc và bằng chứng: chọn hiện số liệu cụ thể và căn cứ, không hiện phần trăm tin cậy.**
+- Lỗi ở #11 là dữ liệu chỗ trống, nên khách cần thấy "còn 1 chỗ, cần 2" và "dữ liệu lúc 15:00" để tự kiểm.
+- Đã loại thanh phần trăm tin cậy: một con số % không cho khách biết sai ở đâu và kiểm bằng cách nào.
+- Đã loại banner chung "AI có thể sai": không chỉ ra chỗ nào cần kiểm.
+
+**Cách điều khiển mức tự chủ: tách hai bước, giữ chỗ (tự làm, có đếm ngược và nút nhả) rồi mới xác nhận đổi (cần khách duyệt).**
+- Giữ chỗ 20 phút bảo vệ khách trong lúc cân nhắc, nên một lượt xác nhận không làm khách mất chuyến.
+- Đã loại một nút "Đổi ngay" kèm hộp thoại "Bạn chắc chứ?": không bảo vệ chỗ trong lúc khách cân nhắc và dễ bị bấm lướt.
+- Đã loại "chỉ nhân viên đổi": khách gấp phải chờ người, chuyến sáng mai có thể hết chỗ.
