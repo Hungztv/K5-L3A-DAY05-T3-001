@@ -193,9 +193,6 @@ Mức nào cũng có giá, trỏ về kịch bản ở §2:
 - **Tự làm:** giá là #11 (đổi sang BM217 chỉ còn 1 chỗ cho 2 người, mất lượt miễn phí mà vẫn thiếu chỗ) và #5 (đổi ngay khi khách đang bực).
 - **Cấm / chỉ nhân viên đổi:** giá là khách gấp (#5, họp 8h sáng mai) phải chờ người, trong khi BM217 chỉ còn 1 chỗ và BM205 còn 4.
 
-Mỗi người đã chọn: [nhóm điền: Tú ... / Bạn 2 ... / Bạn 3 ... / Bạn 4 ...]
-**Nhóm chốt:** cần người duyệt (khách bấm xác nhận), kèm `giu_cho_chuyen_moi` tự làm chạy trước. Giữ chỗ 20 phút bảo vệ khách trong lúc họ xem, nên một lượt xác nhận ngắn không làm khách mất chuyến.
-
 ### Thử mức đã đặt trên 3 kịch bản
 
 | Kịch bản | Cái sai có bị chặn không | Còn làm khi lẽ ra phải hỏi không | Người dùng bình thường có chờ vô ích không |
@@ -203,7 +200,3 @@ Mỗi người đã chọn: [nhóm điền: Tú ... / Bạn 2 ... / Bạn 3 ... 
 | **#10** hoàn vé | Có: `gui_yeu_cau_hoan_ve` chỉ chạy sau khi khách bấm "Xác nhận gửi yêu cầu hoàn tiền" trên thẻ cảnh báo | Không: AI chỉ hiển thị thẻ cảnh báo kèm hai lựa chọn khác ("Xem chuyến bay thay thế", "Nói chuyện với nhân viên") | Khách thật sự muốn hoàn mất thêm một lượt bấm, chấp nhận được vì hoàn xử lý tới 90 ngày |
 | **#11** đổi sang chuyến 1 chỗ | Có: `doi_chuyen_bay` bị chặn vì số chỗ (1) nhỏ hơn số hành khách (2), lượt miễn phí còn nguyên | Không: AI hỏi khách chọn chuyến đủ chỗ trước khi giữ chỗ | Khách phải chọn một trong hai chuyến sáng mai, đáng vì thực sự có hai lựa chọn |
 | **#3** "Chuyến của mình mấy giờ bay vậy?" (bình thường) | Không có gì để chặn: `tra_cuu_dat_cho` chỉ đọc | Không | Không: tra cứu tự làm, trả lời ngay |
-
-### Lời hứa với người dùng đã đổi
-
-Cùng một model, khi `doi_chuyen_bay` chuyển từ tự làm sang cần người duyệt thì lời hứa đổi từ "mình sẽ đổi vé giúp chị" thành "mình đã giữ chỗ và soạn sẵn, chị bấm xác nhận để đổi". Khách không còn kỳ vọng AI tự quyết việc khó đảo, nên khi lỗi xảy ra họ biết quyết định cuối là của mình.
