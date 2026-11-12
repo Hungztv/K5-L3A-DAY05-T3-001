@@ -118,21 +118,102 @@ hành động quá sớm khi khách đang lo lắng vì chuyến BM213 bị hu�
   (1) AI đã hiển thị cảnh báo về việc không thể huỷ và thời gian xử lý, và
   (2) khách đã bấm nút "Xác nhận gửi yêu cầu hoàn tiền"; trước đó AI chỉ được
   hỏi lại, hiển thị chuyến thay thế hoặc chuyển nhân viên.
-### Kịch bản #11 — "đổi sang chuyến 9h tối đi"
+### 3.1. Tình huống kiểm thử
 
-BM217 21:00 chỉ còn **1 chỗ**; đặt chỗ TRV-7Q2K có 2 hành khách (An và bé Bình, 5 tuổi). Đây là ca khách xác nhận mơ hồ: không nói đổi cho ai và không biết chỗ còn bao nhiêu.
+**Tin nhắn người dùng:**
 
-- **AI nói (nguyên văn):** "BM217 21:00 hôm nay chỉ còn **1 chỗ**, mà chị và bé Bình cần **2 chỗ**, nên mình chưa đổi để không mất lần đổi miễn phí duy nhất. Hai chuyến sáng mai còn đủ chỗ cho cả hai: BM201 07:00 (còn 9 chỗ), BM205 09:30 (còn 4 chỗ). Chị chọn chuyến nào, mình giữ chỗ 20 phút (chưa đổi vé) để chị xác nhận ạ?"
-- **Người dùng thấy:** thẻ so sánh 3 chuyến kèm dòng "cần 2 chỗ": BM217 (còn 1, **không đủ**, làm mờ), BM201 (còn 9), BM205 (còn 4); mỗi chuyến đủ chỗ có nút "Giữ chỗ 20 phút"; dòng căn cứ "Dựa trên: dữ liệu chỗ trống lúc 15:00"; nút "Nói chuyện với nhân viên".
-- **Làm gì tiếp:** chọn một chuyến đủ chỗ → giữ chỗ → xác nhận đổi; hoặc gặp nhân viên. Nếu khách không làm gì thì **chỗ giữ tự nhả sau 20 phút và lượt đổi miễn phí còn nguyên**.
-- **Ai được báo, sau bao lâu:** chưa ai cần báo, vì chưa có gì đắt xảy ra. Chỉ khi khách chọn chuyển nhân viên thì nhân viên nhận tóm tắt: đặt chỗ TRV-7Q2K, chuyến khách muốn (BM217), số chỗ còn lại, số hành khách.
-- **Quyết định:** hỏi lại kèm giới hạn (nói vì sao chưa đổi, đưa lựa chọn).
-  - Đã loại "đổi ngay theo lời khách": mất lần đổi miễn phí duy nhất mà vẫn thiếu 1 chỗ cho bé.
-  - Đã loại "đổi rồi báo sau": đổi vé khó đảo lại, báo sau thì đã muộn.
-  - Đã loại "từ chối chung chung hoặc chuyển nhân viên ngay": khách cần biết ngay chuyến nào còn chỗ cho hai mẹ con, chờ người thì chuyến sáng mai có thể hết chỗ.
-- **Loại lỗi:** **ngữ cảnh**. Khách nói đúng điều muốn, hệ thống chạy đúng thiết kế, nhưng chuyến được chọn không còn đủ chỗ mà khách không nhìn thấy số chỗ. Cách nói: không trách khách, nêu số liệu; cách sửa: kiểm tra số chỗ ≥ số hành khách trước khi đổi.
-- **HAX/PAIR:**
-  - **G10** → câu hỏi lại ở trên thay vì đổi theo lời khách.
-  - **G2** → dòng "còn 1 chỗ, cần 2 chỗ" và chuyến BM217 bị làm mờ trên thẻ.
-  - **G11** → dòng "chưa đổi để không mất lần đổi miễn phí duy nhất" và nhãn "Dựa trên: dữ liệu chỗ trống lúc 15:00".
-- **Lỗi sửa câu chữ không cứu được:** AI nói "mình sẽ đổi" hoặc "đã đổi" khi chưa kiểm tra số chỗ và chưa có xác nhận của khách. Dù câu chữ hay đến đâu, `doi_chuyen_bay` đã chạy thì không đảo lại được. Thiết kế cứu: `doi_chuyen_bay` chỉ chạy khi (1) số chỗ còn ≥ số hành khách và (2) khách đã bấm xác nhận; trước đó AI chỉ được dùng `tra_cuu_dat_cho` và `giu_cho_chuyen_moi` (giữ 20 phút, tự nhả).
+> "đổi sang chuyến 9h tối đi"
+
+**Bối cảnh hệ thống:**
+- Mã đặt chỗ: TRV-7Q2K.
+- Hành khách: Nguyễn Minh An và bé Nguyễn Gia Bình (5 tuổi).
+- Chuyến muốn đổi: BM217 – Hà Nội → TP.HCM – 21:00 ngày 12/11/2026.
+- Số chỗ còn trống trên BM217: 1.
+- Số hành khách cần đổi: 2.
+- Quyền lợi: Đổi miễn phí một lần trong vòng 48 giờ.
+
+**Vấn đề:** Yêu cầu của khách rõ ràng nhưng chuyến BM217 không đủ chỗ cho cả hai hành khách. Nếu AI gọi `doi_chuyen_bay` ngay, khách có thể mất lượt đổi miễn phí duy nhất mà vẫn không giải quyết được nhu cầu đi cùng nhau.
+
+### 3.2. Người dùng nhìn thấy gì?
+
+**Trạng thái 1 – AI đang kiểm tra**
+
+AI tiếp nhận yêu cầu và kiểm tra thông tin đặt chỗ, số lượng hành khách và tình trạng chỗ trống bằng `tra_cuu_dat_cho`.
+
+Hiển thị trên giao diện:
+
+> Đang kiểm tra chuyến bay và chỗ trống cho 2 hành khách...
+
+**Trạng thái 2 – Phát hiện không đủ chỗ**
+
+AI không thực hiện đổi vé. Thay vào đó, hiển thị thông báo rõ ràng:
+
+> Mình đã kiểm tra chuyến BM217 lúc 21:00 ngày hôm nay. Hiện chuyến chỉ còn 1 chỗ, trong khi đặt chỗ của bạn có 2 hành khách (bạn và bé Bình).
+>
+> Vì vậy, mình chưa thực hiện đổi vé để tránh trường hợp hai mẹ con không thể bay cùng nhau và mất lượt đổi miễn phí duy nhất.
+
+**Trạng thái 3 – Đưa ra phương án thay thế**
+
+Hiển thị các chuyến còn đủ chỗ cho cả hai hành khách:
+
+| Chuyến bay | Thời gian | Chỗ còn lại | Trạng thái |
+|---|---|---:|---|
+| BM201 | 13/11 – 07:00 | 9 | Có thể lựa chọn |
+| BM205 | 13/11 – 09:30 | 4 | Có thể lựa chọn |
+| BM217 | 12/11 – 21:00 | 1 | Không đủ chỗ |
+
+AI phản hồi:
+
+> Hiện có hai chuyến phù hợp để hai mẹ con cùng bay:
+>
+> - BM201: 07:00 sáng mai, còn 9 chỗ.
+> - BM205: 09:30 sáng mai, còn 4 chỗ.
+>
+> Bạn muốn chọn chuyến nào? Mình sẽ kiểm tra và giữ chỗ trước khi thực hiện đổi vé.
+
+**Trạng thái 4 – Chờ người dùng xác nhận**
+
+Giao diện hiển thị hai lựa chọn:
+
+- [Chọn BM201 – 07:00]
+- [Chọn BM205 – 09:30]
+
+Sau khi khách chọn, AI thực hiện `giu_cho_chuyen_moi` trước. Việc giữ chỗ có hiệu lực 20 phút và tự động nhả nếu khách không xác nhận.
+
+Chỉ sau khi khách xác nhận rõ ràng, AI mới gọi `doi_chuyen_bay`.
+
+### 3.3. Nếu AI đã đổi nhầm thì người dùng thấy gì?
+
+Đây là nhánh xử lý lỗi nghiêm trọng, dùng để kiểm thử trường hợp AI đã gọi `doi_chuyen_bay` sai.
+
+**Tin nhắn người dùng:**
+
+> "Ủa sao đổi sang 9h tối vậy, mình đâu bảo, đổi lại đi!"
+
+AI không được hứa đổi lại miễn phí hoặc tự gọi `doi_chuyen_bay` lần nữa vì lượt đổi miễn phí duy nhất đã được sử dụng và thao tác không thể tự đảo ngược.
+
+**Phản hồi hiển thị:**
+
+> Mình xin lỗi. Hệ thống đã thực hiện đổi vé sang chuyến BM217 lúc 21:00 mà chưa xác nhận đầy đủ yêu cầu của bạn.
+>
+> Mình đã ghi nhận vấn đề. Do lượt đổi miễn phí đã được sử dụng, mình không thể tự ý đổi ngược hoặc cam kết khôi phục vé ban đầu.
+>
+> Mình sẽ chuyển trường hợp này đến nhân viên Bay Mẫu để kiểm tra và hỗ trợ bạn.
+
+Sau đó, AI gọi `chuyen_nhan_vien`, gửi kèm:
+- Mã đặt chỗ TRV-7Q2K.
+- Thông tin hai hành khách.
+- Chuyến bay ban đầu BM213 đã bị huỷ.
+- Chuyến BM217 đã được đổi nhầm.
+- Lượt đổi miễn phí đã sử dụng.
+- Nội dung yêu cầu ban đầu và nội dung khiếu nại của khách.
+
+### 3.4. Nguyên tắc UX rút ra
+
+1. **Minh bạch:** AI phải thông báo chính xác số chỗ còn lại, không che giấu hoặc tự suy diễn dữ liệu.
+2. **Không tự ý hành động:** Không gọi `doi_chuyen_bay` khi chưa xác nhận đủ chỗ cho tất cả hành khách.
+3. **Giải thích hậu quả:** Cho khách biết vì sao yêu cầu chưa được thực hiện và rủi ro nếu tiếp tục.
+4. **Đưa ra phương án thay thế:** Không chỉ thông báo lỗi mà phải cung cấp các chuyến bay phù hợp.
+5. **Khả năng phục hồi:** Nếu lỗi đã xảy ra, AI phải thừa nhận hành động thực tế, không hứa những điều không thể thực hiện và chuyển nhân viên kèm đầy đủ ngữ cảnh.
+
+**Tiêu chí thành công:** Với yêu cầu "đổi sang chuyến 9h tối đi", hệ thống không được tiêu tốn lượt đổi miễn phí. Người dùng phải hiểu vì sao BM217 không phù hợp và có thể tiếp tục chọn một chuyến thay thế mà không phải nhập lại thông tin đặt chỗ.
