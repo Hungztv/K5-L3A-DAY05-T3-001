@@ -4,10 +4,10 @@
 
 | Họ và tên | Mã học viên | Việc đã làm |
 |---|---|---|
-| Dương | `[điền mã học viên]` | Tạo cấu trúc prototype, biên tập và tích hợp các phần §1–§3, phân loại mức tự chủ cho các tool và tham gia chốt §4. |
-| Anhtu | `[điền mã học viên]` | Viết các kịch bản rủi ro ở §2, UX cho kịch bản #11 và đóng góp nội dung §4 về mức tự chủ. |
-| Duy | `[điền mã học viên]` | Phân tích cost-of-error và mức tự chủ cho từng tool; đề xuất các quy tắc duyệt và giới hạn hành động. |
-| Hùng | `[điền mã học viên]` | Viết UX khi AI sai cho kịch bản #10 |
+| Lê Đoàn Dương | 2A202603372 | Tạo cấu trúc prototype, biên tập và tích hợp các phần §1–§3, phân loại mức tự chủ cho các tool và tham gia chốt §4. |
+| Nguyễn Anh Tú | 2A202603434 | Viết các kịch bản rủi ro ở §2, UX cho kịch bản #11 và đóng góp nội dung §4 về mức tự chủ. |
+| Nguyễn Trung Duy | 2A202603387 | Phân tích cost-of-error và mức tự chủ cho từng tool; đề xuất các quy tắc duyệt và giới hạn hành động. |
+| Dương Mạnh Hùng | 2A202603431 | Viết UX khi AI sai cho kịch bản #10, hoàn thiện prototype và chuẩn bị demo |
 
 ## §1. Lát cắt & phạm vi
 
@@ -320,3 +320,49 @@ Sau khi chuyển `doi_chuyen_bay` sang mức cần khách duyệt, lời hứa t
 
 Cách nói này giúp khách hiểu AI có thể chuẩn bị và đề xuất, nhưng quyết định
 cuối cùng đối với hành động khó đảo lại vẫn thuộc về khách.
+
+## §5. Prototype
+
+Prototype được xây dựng dưới dạng ứng dụng web đơn trang tương tác (Single Page Application bằng HTML/CSS/JS thuần), chạy trực tiếp tại file [prototype/index.html](file:///c:/Users/duong/K5-L3A-DAY05-T3-001/prototype/index.html), không cần cài đặt môi trường, không có backend hay API thật.
+
+Giao diện được thiết kế theo cấu trúc đối chiếu trực quan 2 cột (giống cấu trúc chuẩn của giảng viên):
+- **Cột trái (Phone simulator):** Khung ứng dụng di động hiển thị luồng chat thực tế giữa khách hàng và trợ lý AI Bay Mẫu.
+- **Cột phải (Analysis panels):** Bảng phân tích thiết kế sản phẩm gồm Lời hứa thương hiệu, Bảng trạng thái 5 tool, và Danh mục chú thích HAX/PAIR được đánh số.
+
+### §5.1. Thử nghiệm 3 mức tự chủ của tool `doi_chuyen_bay`
+
+Tại thanh điều khiển trên cùng, người dùng có thể chuyển đổi giữa 3 mức tự chủ để thấy rõ vì sao nhóm chọn **Mức ②**:
+
+1. **Mức ①: Chỉ gợi ý — khách tự đổi (Thận trọng quá mức):**
+   - **Cách AI xử lý:** AI chỉ liệt kê các chuyến còn chỗ, không giữ chỗ và không đổi vé. Cung cấp nút *"Mở trang Đổi lịch (bạn tự chọn)"*.
+   - **Lời hứa:** *"Mình cho bạn biết lựa chọn; bạn tự đổi."*
+   - **Đánh giá rủi ro:** An toàn nhất cho hệ thống nhưng bắt khách vội phải tự thao tác qua nhiều bước; trong lúc khách lúng túng, các chuyến bay tốt (BM201, BM205) có thể bị người khác đặt hết.
+
+2. **Mức ②: Cần khách xác nhận — AI giữ chỗ 20 phút (Mức nhóm chọn):**
+   - **Cách AI xử lý:** Việc rẻ và đảo được (`giu_cho_chuyen_moi` 20 phút) thì AI tự làm ngay để bảo vệ chỗ cho khách; việc đắt và khó đảo lại (`doi_chuyen_bay` — tiêu tốn lần đổi miễn phí duy nhất) thì chờ khách bấm *"Xác nhận đổi"*.
+   - **Đồng hồ đếm ngược:** Đếm ngược `20:00` phút thời gian thực; nếu khách không xác nhận, chỗ tự động nhả về hệ thống, vé cũ và quyền lợi còn nguyên.
+   - **Lời hứa:** *"Mình giữ chỗ ngay cho bạn; bạn bấm xác nhận thì mình mới đổi."*
+   - **Đánh giá:** Cân bằng hoàn hảo giữa tốc độ hỗ trợ khách đang vội và sự an toàn khi thực thi hành động không thể hoàn tác.
+
+3. **Mức ③: Tự làm + hoàn tác (Liều lĩnh / Quá tay):**
+   - **Cách AI xử lý:** AI tự động chọn chuyến (ví dụ BM201) và gọi ngay `doi_chuyen_bay`, sau đó cho phép khách bấm *"Hoàn tác trong 10:00 phút"*.
+   - **Lời hứa:** *"Mình đổi luôn cho bạn, sai thì bấm hoàn tác."*
+   - **Đánh giá rủi ro:** Quá tay khi khách nói mơ hồ (khách có thể muốn chuyến 09:30 vì có con nhỏ 5 tuổi chưa dậy kịp). Đặc biệt ở Ca #11, AI máy móc đổi sang BM217 (chỉ còn 1 chỗ) sẽ khiến bé Bình 5 tuổi bị rớt lại mà khách không hề hay biết. Nếu khách không đọc thông báo trong 10 phút, thiệt hại không thể cứu vãn.
+
+### §5.2. Các kịch bản thử nghiệm trên Prototype
+
+Người dùng có thể chuyển đổi 3 nút tình huống để kiểm tra phản ứng của AI:
+- **Ca mơ hồ #4 ("Đổi giúp mình sang sáng mai nhé"):** AI phát hiện sáng mai có 2 chuyến (07:00 và 09:30), nhận diện sự mơ hồ (nhãn [1]), hỏi lại xác nhận chuyến và số người bay (nhãn [3]), đồng thời tạm giữ chuyến phù hợp trong 20 phút.
+- **Ca nguy hiểm #11 ("Đổi sang chuyến 9h tối đi"):** Chuyến BM217 (21:00) chỉ còn 1 chỗ trong khi đặt chỗ có 2 người (An và bé Bình 5 tuổi). Ở Mức ②, AI phát hiện thiếu chỗ, **khoá chuyến BM217**, cảnh báo đỏ ngăn mất vé và chủ động đề xuất 2 chuyến sáng mai đủ chỗ (BM201, BM205).
+- **Ca hoàn vé #10 ("Thôi huỷ hết đi, hoàn tiền"):** Bấm nút kích hoạt modal hoàn vé. Hộp thoại cảnh báo đỏ: *"Gửi rồi không thể huỷ"*, *"Thời gian xử lý tới 90 ngày"*, *"Hoàn về thẻ gốc, không đền tiền mặt do bão"*. Bắt buộc người dùng tích chọn checkbox *"Tôi hiểu yêu cầu này không thể rút lại"* thì nút gửi mới sáng lên.
+
+### §5.3. Bảng đối chiếu 6 chú thích HAX / PAIR trên giao diện
+
+| Ký hiệu | Nguyên tắc | Vị trí thể hiện trên Prototype |
+|---|---|---|
+| **[1]** | **HAX G2 · Làm rõ AI làm tốt tới đâu** | Nhãn *"Mình chưa chắc"* khi khách nói mơ hồ, hoặc cảnh báo *"Không đủ chỗ"* khi khách đòi chuyến BM217. |
+| **[2]** | **HAX G11 + PAIR Explainability** | Dòng căn cứ *"Dựa trên: đặt chỗ TRV-7Q2K · dữ liệu chỗ trống lúc 15:00 · chính sách Bay Mẫu"*. |
+| **[3]** | **HAX G10 · Thu hẹp khi nghi ngờ** | Đặt câu hỏi cụ thể: *"Bạn muốn bay chuyến nào và đổi cho cả 2 người chứ?"* thay vì tự đoán mò. |
+| **[4]** | **HAX G8/G9 + PAIR Feedback & Control** | Khối đếm ngược 20 phút giữ chỗ tạm thời (Mức ②) hoặc đếm ngược 10 phút hoàn tác (Mức ③). |
+| **[5]** | **PAIR Errors + Graceful Failure** | Nút *"Gặp nhân viên"* luôn hiện diện ở mọi bước; tự động đóng gói tóm tắt ngữ cảnh gửi nhân viên. |
+| **[6]** | **HAX G9 · Sửa sai dễ dàng** | Nút *"Sửa: chọn chuyến khác"* trực tiếp ngay trên thẻ xác nhận, không bắt khách phải làm lại từ đầu. |
