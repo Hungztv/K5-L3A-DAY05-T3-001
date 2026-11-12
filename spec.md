@@ -1,14 +1,4 @@
 # Bài nộp LAB5 — T3 Du lịch · Nhóm [tên nhóm]
-
-**Lớp:** L3A · **Bàn / zone:** [điền] · **Track:** T3 Du lịch
-
-| Họ và Tên | Mã Học Viên | Việc đã làm |
-|---|---|---|
-| Nguyễn Anh Tú | 2A202603434 | [điền: ghi cụ thể phần mình làm] |
-| [Họ tên thành viên 2] | [mã học viên] | [điền] |
-| [Họ tên thành viên 3] | [mã học viên] | [điền] |
-| [Họ tên thành viên 4] | [mã học viên] | [điền] |
-
 ## §1. Lát cắt & phạm vi
 
 **Lát cắt (chép từ track):** Trong **Đặt chỗ của tôi**, khi **hành khách** vừa nhận tin chuyến bay bị huỷ và nhắn hỏi, **AI đề xuất và giữ chỗ chuyến thay thế, hỏi lại cho rõ, đổi vé, hay chuyển nhân viên**, để khách tới nơi kịp mà không mất vé hay tiền vì một thao tác không đảo lại được.
