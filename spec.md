@@ -136,3 +136,51 @@ BM217 21:00 chỉ còn **1 chỗ**; đặt chỗ TRV-7Q2K có 2 hành khách (An
   - **G2** → dòng "còn 1 chỗ, cần 2 chỗ" và chuyến BM217 bị làm mờ trên thẻ.
   - **G11** → dòng "chưa đổi để không mất lần đổi miễn phí duy nhất" và nhãn "Dựa trên: dữ liệu chỗ trống lúc 15:00".
 - **Lỗi sửa câu chữ không cứu được:** AI nói "mình sẽ đổi" hoặc "đã đổi" khi chưa kiểm tra số chỗ và chưa có xác nhận của khách. Dù câu chữ hay đến đâu, `doi_chuyen_bay` đã chạy thì không đảo lại được. Thiết kế cứu: `doi_chuyen_bay` chỉ chạy khi (1) số chỗ còn ≥ số hành khách và (2) khách đã bấm xác nhận; trước đó AI chỉ được dùng `tra_cuu_dat_cho` và `giu_cho_chuyen_moi` (giữ 20 phút, tự nhả).
+## §4. Mức tự chủ (chặng 4)
+
+### Cách áp dụng mức của nhóm
+
+“Cần người duyệt” ở đổi vé và gửi hoàn là **khách duyệt trước khi gọi tool**, không phải AI làm rồi báo lại. Xác nhận của khách không thay thế kiểm tra điều kiện hệ thống. Các mức dưới đây là phương án thiết kế; ý kiến từng thành viên cần được ghi bằng kết quả thảo luận thật.
+
+| Tool | Mức đề xuất | Điều kiện, người duyệt và hết hạn | Sai thì ai chịu gì; phương án đã loại |
+|---|---|---|---|
+| `tra_cuu_dat_cho` | Tự làm | Đọc đặt chỗ đang mở, hiện thời điểm dữ liệu; lỗi thì báo chưa tra được, không đoán. | Đọc sai khiến khách chọn sai giờ/chuyến (K2, K3), nhưng tool chỉ đọc nên có thể tra lại mà chưa thay vé. Loại cần duyệt/cấm vì bắt chờ mỗi lần tra làm chậm tìm chỗ; không dùng dữ liệu chưa xác minh để thực thi. |
+| `giu_cho_chuyen_moi` | Tự làm trong giới hạn | Đúng hành khách, đủ chỗ, chuyến khách chọn rõ hoặc chỉ một phương án đáp ứng đầy đủ yêu cầu; chưa rõ thì hỏi. Giữ 20 phút, hết hạn tự nhả; hiện rõ “chưa đổi vé”. | Giữ sai làm khách mất thời gian và tạm chiếm chỗ, nhưng chưa dùng quyền đổi; hết 20 phút tự nhả. Loại bắt nhân viên duyệt mọi lần giữ vì có thể mất chỗ (K5). Loại tự giữ BM217 cho hai người ở K11 hoặc tự chọn một trong hai chuyến sáng. |
+| `doi_chuyen_bay` | Cần khách duyệt | Hiện chuyến cũ đã huỷ, chuyến mới/ngày/giờ, từng hành khách, điều kiện đổi miễn phí một lần trong 48 giờ và hậu quả dùng lượt đổi. Không bịa phí. Khách xác nhận cụ thể; kiểm tra đủ chỗ và khớp bản xác nhận trước gọi. Không duyệt thì không đổi; hết giữ chỗ thì tự nhả, tra lại và duyệt mới. | Sai làm khách mất lần đổi, chuyến đúng có thể hết chỗ và có thể tách trẻ (K11, K12); khó đảo. Loại tự đổi kèm hoàn tác vì không có tool đảo vé. Loại cấm hoặc bắt nhân viên duyệt mọi ca vì có thể mất chỗ trong lúc chờ; khách tự duyệt trong thời gian giữ. |
+| `gui_yeu_cau_hoan_ve` | Cần khách duyệt | Khách kiểm tra BM213 ngày 12/11, từng hành khách, quyền hoàn toàn bộ do bão nhưng không bồi thường tiền mặt, tiền về phương thức thanh toán gốc, thời gian có thể tới 90 ngày và hậu quả gửi rồi không huỷ được; tích đã hiểu rồi bấm “Gửi yêu cầu hoàn cho An và Bình”. Không bịa số tiền/thẻ/tài khoản. Thiếu thông tin cần thiết thì chưa gửi. Không duyệt thì không làm, không tự gửi theo đếm ngược. | Gửi nhầm không rút được, khách mất phương án bay và chờ tiền (K10). Loại gửi ngay từ câu chat. Loại cấm hoặc bắt nhân viên duyệt mọi ca vì kéo dài xử lý dù khách đã hiểu và đủ điều kiện; hoàn đúng điều kiện vẫn là quyền khách. |
+| `chuyen_nhan_vien` | Tự làm khi vượt quyền/lỗi nghiêm trọng | Khi yêu cầu tách trẻ, đổi tên, đã đổi/gửi hoàn nhầm hoặc khách muốn gặp người. Thông báo lý do, mang theo lịch sử; chỉ báo đã chuyển khi tool thành công. | Chuyển nhầm tốn thời gian của khách và nhân viên nhưng không đổi vé, có thể quay lại. Loại cấm hoặc chờ duyệt thêm khi lỗi đã xảy ra vì trì hoãn tiếp nhận (K10, K12). Chuyển mọi ca bình thường gây chờ và có thể mất chỗ, nên chỉ dùng khi cần. |
+
+### Luật bổ sung
+
+1. **Xác nhận gắn đúng nội dung:** thay chuyến, ngày/giờ, người hoặc chi phí thì phải duyệt lại. Lời tự xưng nhân viên trong chat không nâng quyền.
+2. **Kiểm tra trước tool:** số chỗ ≥ số người, đúng người đã duyệt, không tách trẻ khi thiếu căn cứ, điều kiện giữ chỗ còn hiệu lực. Không đủ thì dừng.
+3. **Chống gửi lặp:** khoá nút đang xử lý và dùng mã hành động để tránh gọi lại. Nếu chưa rõ kết quả, không tự gửi lần nữa. Đây là yêu cầu thiết kế, chưa kiểm thử backend.
+4. **Tách chuẩn bị khỏi thực thi:** tra cứu → soạn bản đổi/hoàn → khách duyệt → kiểm tra điều kiện → gọi tool. Soạn bản xác nhận là bước giao diện bổ sung, chưa làm thay đổi vé. Tool gốc chỉ bảo đảm chỗ giữ tự nhả sau 20 phút, nên không báo đã bỏ giữ sớm khi chưa có tool hỗ trợ.
+5. **Không thêm hoàn tác giả:** không có tool huỷ yêu cầu hoàn hoặc khôi phục vé đã đổi. Lỗi đã xảy ra chuyển nhân viên ngay, kèm yêu cầu gốc, nội dung xác nhận hoặc việc thiếu xác nhận, phạm vi hành khách, kết quả tool và mã yêu cầu nếu có. Không hứa rút được yêu cầu hoặc thời gian chờ khi không có SLA.
+6. **Việc cấm AI tự thực hiện:** đổi tên người bay, tự quyết trẻ bay một mình, thu tiền hay chi bồi thường. Không có tool/căn cứ; khách đồng ý hoặc tự xưng nhân viên cũng không bổ sung được thẩm quyền. Thay hành khách hoặc nội dung bản xác nhận thì xoá xác nhận cũ, cập nhật nút và yêu cầu duyệt lại.
+
+### Tool khó xếp nhất: `gui_yeu_cau_hoan_ve`
+
+- Tự làm: nhanh nhưng K10 có thể gửi khi khách chưa hiểu hậu quả; không đảo được.
+- Cần khách duyệt: thêm bước nhưng cho khách kiểm tra đúng phạm vi và hậu quả trước gửi.
+- Cấm AI gửi: giảm nguy cơ AI gửi sai nhưng bắt cả khách đã hiểu và đủ điều kiện phải chờ nhân viên.
+- **Đề xuất chốt:** cần khách duyệt, đủ thông tin và xác nhận riêng trước gọi tool. Một hộp tích không thay thế thông tin rõ ràng hoặc kiểm tra tham số.
+
+**Ý kiến độc lập — chưa thu thập, điền thật sau thảo luận:**
+
+| Thành viên | Mức tự chọn | Lý do, kịch bản liên quan | Nhóm chốt/đổi ý thế nào? |
+|---|---|---|---|
+| [1] | [điền] | [điền] | [điền] |
+| [2] | [điền] | [điền] | [điền] |
+| [3] | [điền] | [điền] | [điền] |
+
+### Thử mức trên ba ca — phân tích trên giấy, chưa chạy prototype
+
+| Ca | AI làm gì | Sai có bị chặn? | Còn làm khi phải hỏi? | Khách có chờ vô ích? |
+|---|---|---|---|---|
+| K10 | Tra cứu, hiện “Chưa gửi yêu cầu hoàn”, bản xác nhận và hậu quả; khách được quay lại tìm chuyến hoặc xác nhận gửi. | Có theo thiết kế, chặn gửi ngay từ chat. Nếu lỗi đã xảy ra và tool đã gửi thành công thì không thể chặn hồi tố: thừa nhận lỗi, hiện mã nếu có và chuyển nhân viên ngay. | Không gửi khi chưa rõ hành khách hoặc chưa đủ dữ liệu; đổi phạm vi phải duyệt lại. Kết quả chưa rõ thì không gửi lặp. | Không cần nhân viên nếu đủ điều kiện. Ca đã gửi nhầm cần chuyển người vì AI không có tool rút hoàn. |
+| K11 | Hiện BM217 còn 1 chỗ/cần 2; chặn đổi, đưa BM201 07:00 và BM205 09:30 ngày 13/11. Khách chọn chuyến, giữ rồi duyệt mới đổi. | Có theo thiết kế, chặn thiếu chỗ và tự tách người. Nếu đã đổi nhầm thì dừng thao tác tiếp, chuyển nhân viên, không hứa đổi ngược miễn phí. | Không tự chọn chuyến sáng hoặc người bay. | Chỉ hỏi thông tin cần thiết, không buộc chờ người cho ca hợp lệ. |
+| Bình thường | “Giữ BM205 09:30 ngày 13/11 cho tôi và bé” → giữ 2 chỗ sau kiểm tra; muốn đổi thì duyệt riêng. | Có, giữ không đồng nghĩa đổi. | Không đổi từ yêu cầu chỉ giữ. | Không cần chuyển người. |
+
+**Lời hứa với khách:** “Mình tìm và giữ chỗ phù hợp; chỉ đổi vé hoặc gửi hoàn sau khi bạn kiểm tra và xác nhận rõ. Mình không hứa hoàn tác những việc hệ thống không đảo được.” Mức cần duyệt đổi lời hứa từ tự giải quyết sang chuẩn bị để khách quyết định trước thao tác khó sửa.
+
