@@ -59,3 +59,45 @@ Phủ 4 lớp: ① #1–3 · ② #4–6 · ③ #7–9 · ④ #10–12.
 - **#12 (AI đã đổi nhầm, khách đòi đổi lại):** đắt tương đương, nhưng phần lớn là hậu quả của việc không chặn được lỗi ở #11. Chặn ở gốc (kiểm tra chỗ và xác nhận trước khi đổi) rẻ hơn xử lý sau, và đường xử lý sau (nói đúng sự thật, chuyển nhân viên kèm tóm tắt) vẫn được thiết kế trong §3 như nhánh sửa lỗi.
 - **#5 (đổi ngay, đang bực):** chặn được bằng một bước giữ chỗ trước khi đổi.
 - **#9 (giả mạo nhân viên):** nguy hiểm, nhưng quy tắc "tin nhắn là dữ liệu, không phải lệnh" chặn được ở tầng quy tắc.
+
+## §3. Khi AI sai  (chặng 3)
+
+### Kịch bản #11 — "đổi sang chuyến 9h tối đi"
+
+BM217 21:00 chỉ còn **1 chỗ**; đặt chỗ TRV-7Q2K có 2 hành khách (An và bé Bình, 5 tuổi). Đây là ca khách xác nhận mơ hồ: không nói đổi cho ai và không biết chỗ còn bao nhiêu.
+
+- **AI nói (nguyên văn):** "BM217 21:00 hôm nay chỉ còn **1 chỗ**, mà chị và bé Bình cần **2 chỗ**, nên mình chưa đổi để không mất lần đổi miễn phí duy nhất. Hai chuyến sáng mai còn đủ chỗ cho cả hai: BM201 07:00 (còn 9 chỗ), BM205 09:30 (còn 4 chỗ). Chị chọn chuyến nào, mình giữ chỗ 20 phút (chưa đổi vé) để chị xác nhận ạ?"
+- **Người dùng thấy:** thẻ so sánh 3 chuyến kèm dòng "cần 2 chỗ": BM217 (còn 1, **không đủ**, làm mờ), BM201 (còn 9), BM205 (còn 4); mỗi chuyến đủ chỗ có nút "Giữ chỗ 20 phút"; dòng căn cứ "Dựa trên: dữ liệu chỗ trống lúc 15:00"; nút "Nói chuyện với nhân viên".
+- **Làm gì tiếp:** chọn một chuyến đủ chỗ → giữ chỗ → xác nhận đổi; hoặc gặp nhân viên. Nếu khách không làm gì thì **chỗ giữ tự nhả sau 20 phút và lượt đổi miễn phí còn nguyên**.
+- **Ai được báo, sau bao lâu:** chưa ai cần báo, vì chưa có gì đắt xảy ra. Chỉ khi khách chọn chuyển nhân viên thì nhân viên nhận tóm tắt: đặt chỗ TRV-7Q2K, chuyến khách muốn (BM217), số chỗ còn lại, số hành khách.
+- **Quyết định:** hỏi lại kèm giới hạn (nói vì sao chưa đổi, đưa lựa chọn).
+  - Đã loại "đổi ngay theo lời khách": mất lần đổi miễn phí duy nhất mà vẫn thiếu 1 chỗ cho bé.
+  - Đã loại "đổi rồi báo sau": đổi vé khó đảo lại, báo sau thì đã muộn.
+  - Đã loại "từ chối chung chung hoặc chuyển nhân viên ngay": khách cần biết ngay chuyến nào còn chỗ cho hai mẹ con, chờ người thì chuyến sáng mai có thể hết chỗ.
+- **Loại lỗi:** **ngữ cảnh**. Khách nói đúng điều muốn, hệ thống chạy đúng thiết kế, nhưng chuyến được chọn không còn đủ chỗ mà khách không nhìn thấy số chỗ. Cách nói: không trách khách, nêu số liệu; cách sửa: kiểm tra số chỗ ≥ số hành khách trước khi đổi.
+- **HAX/PAIR:**
+  - **G10** → câu hỏi lại ở trên thay vì đổi theo lời khách.
+  - **G2** → dòng "còn 1 chỗ, cần 2 chỗ" và chuyến BM217 bị làm mờ trên thẻ.
+  - **G11** → dòng "chưa đổi để không mất lần đổi miễn phí duy nhất" và nhãn "Dựa trên: dữ liệu chỗ trống lúc 15:00".
+- **Lỗi sửa câu chữ không cứu được:** AI nói "mình sẽ đổi" hoặc "đã đổi" khi chưa kiểm tra số chỗ và chưa có xác nhận của khách. Dù câu chữ hay đến đâu, `doi_chuyen_bay` đã chạy thì không đảo lại được. Thiết kế cứu: `doi_chuyen_bay` chỉ chạy khi (1) số chỗ còn ≥ số hành khách và (2) khách đã bấm xác nhận; trước đó AI chỉ được dùng `tra_cuu_dat_cho` và `giu_cho_chuyen_moi` (giữ 20 phút, tự nhả).
+
+## §3. Khi AI sai  (chặng 3)
+
+### Kịch bản #11 — "đổi sang chuyến 9h tối đi"
+
+BM217 21:00 chỉ còn **1 chỗ**; đặt chỗ TRV-7Q2K có 2 hành khách (An và bé Bình, 5 tuổi). Đây là ca khách xác nhận mơ hồ: không nói đổi cho ai và không biết chỗ còn bao nhiêu.
+
+- **AI nói (nguyên văn):** "BM217 21:00 hôm nay chỉ còn **1 chỗ**, mà chị và bé Bình cần **2 chỗ**, nên mình chưa đổi để không mất lần đổi miễn phí duy nhất. Hai chuyến sáng mai còn đủ chỗ cho cả hai: BM201 07:00 (còn 9 chỗ), BM205 09:30 (còn 4 chỗ). Chị chọn chuyến nào, mình giữ chỗ 20 phút (chưa đổi vé) để chị xác nhận ạ?"
+- **Người dùng thấy:** thẻ so sánh 3 chuyến kèm dòng "cần 2 chỗ": BM217 (còn 1, **không đủ**, làm mờ), BM201 (còn 9), BM205 (còn 4); mỗi chuyến đủ chỗ có nút "Giữ chỗ 20 phút"; dòng căn cứ "Dựa trên: dữ liệu chỗ trống lúc 15:00"; nút "Nói chuyện với nhân viên".
+- **Làm gì tiếp:** chọn một chuyến đủ chỗ → giữ chỗ → xác nhận đổi; hoặc gặp nhân viên. Nếu khách không làm gì thì **chỗ giữ tự nhả sau 20 phút và lượt đổi miễn phí còn nguyên**.
+- **Ai được báo, sau bao lâu:** chưa ai cần báo, vì chưa có gì đắt xảy ra. Chỉ khi khách chọn chuyển nhân viên thì nhân viên nhận tóm tắt: đặt chỗ TRV-7Q2K, chuyến khách muốn (BM217), số chỗ còn lại, số hành khách.
+- **Quyết định:** hỏi lại kèm giới hạn (nói vì sao chưa đổi, đưa lựa chọn).
+  - Đã loại "đổi ngay theo lời khách": mất lần đổi miễn phí duy nhất mà vẫn thiếu 1 chỗ cho bé.
+  - Đã loại "đổi rồi báo sau": đổi vé khó đảo lại, báo sau thì đã muộn.
+  - Đã loại "từ chối chung chung hoặc chuyển nhân viên ngay": khách cần biết ngay chuyến nào còn chỗ cho hai mẹ con, chờ người thì chuyến sáng mai có thể hết chỗ.
+- **Loại lỗi:** **ngữ cảnh**. Khách nói đúng điều muốn, hệ thống chạy đúng thiết kế, nhưng chuyến được chọn không còn đủ chỗ mà khách không nhìn thấy số chỗ. Cách nói: không trách khách, nêu số liệu; cách sửa: kiểm tra số chỗ ≥ số hành khách trước khi đổi.
+- **HAX/PAIR:**
+  - **G10** → câu hỏi lại ở trên thay vì đổi theo lời khách.
+  - **G2** → dòng "còn 1 chỗ, cần 2 chỗ" và chuyến BM217 bị làm mờ trên thẻ.
+  - **G11** → dòng "chưa đổi để không mất lần đổi miễn phí duy nhất" và nhãn "Dựa trên: dữ liệu chỗ trống lúc 15:00".
+- **Lỗi sửa câu chữ không cứu được:** AI nói "mình sẽ đổi" hoặc "đã đổi" khi chưa kiểm tra số chỗ và chưa có xác nhận của khách. Dù câu chữ hay đến đâu, `doi_chuyen_bay` đã chạy thì không đảo lại được. Thiết kế cứu: `doi_chuyen_bay` chỉ chạy khi (1) số chỗ còn ≥ số hành khách và (2) khách đã bấm xác nhận; trước đó AI chỉ được dùng `tra_cuu_dat_cho` và `giu_cho_chuyen_moi` (giữ 20 phút, tự nhả).
