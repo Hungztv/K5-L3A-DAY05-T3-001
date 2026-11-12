@@ -151,3 +151,208 @@ Sau đó, AI gọi `chuyen_nhan_vien`, gửi kèm:
 5. **Khả năng phục hồi:** Nếu lỗi đã xảy ra, AI phải thừa nhận hành động thực tế, không hứa những điều không thể thực hiện và chuyển nhân viên kèm đầy đủ ngữ cảnh.
 
 **Tiêu chí thành công:** Với yêu cầu "đổi sang chuyến 9h tối đi", hệ thống không được tiêu tốn lượt đổi miễn phí. Người dùng phải hiểu vì sao BM217 không phù hợp và có thể tiếp tục chọn một chuyến thay thế mà không phải nhập lại thông tin đặt chỗ.
+
+## §4. Mức tự chủ
+
+### 4.1. Phân loại mức tự chủ cho từng tool
+
+Nhóm phân loại 5 tool theo ba mức: tự làm, cần người duyệt và cấm. Tiêu chí chính là cost-of-error: hậu quả nếu AI làm sai, khả năng đảo ngược và chi phí phát sinh khi phải chờ người xác nhận.
+
+| Tool | Mức tự chủ | Ai duyệt? | Lý do |
+|---|---|---|---|
+| `tra_cuu_dat_cho` | Tự làm | Không cần | Chỉ đọc dữ liệu đặt chỗ, hành khách và chuyến bay. Không làm thay đổi vé hay quyền lợi của khách. Nếu truy vấn sai, AI có thể tra cứu lại. |
+| `giu_cho_chuyen_moi` | Tự làm (có điều kiện) | Không cần duyệt từng lần | Giữ chỗ chỉ có hiệu lực 20 phút và tự động nhả nếu không đổi vé. AI được phép thực hiện khi đã xác định rõ chuyến bay, hành khách và chuyến còn đủ chỗ cho tất cả người cần đổi. |
+| `doi_chuyen_bay` | Cần người duyệt | Khách hàng đứng tên đặt chỗ | Đây là hành động khó đảo ngược, sử dụng lần đổi miễn phí duy nhất. Trước khi thực hiện, khách phải nhìn thấy chuyến mới, thời gian bay, danh sách hành khách và xác nhận rõ ràng. |
+| `gui_yeu_cau_hoan_ve` | Cần người duyệt | Khách hàng đứng tên đặt chỗ | Gửi yêu cầu hoàn vé xong không thể huỷ, thời gian xử lý có thể tới 90 ngày. AI phải thông báo rõ hậu quả, quyền lợi và phương thức hoàn tiền trước khi khách xác nhận. |
+| `chuyen_nhan_vien` | Tự làm | Không cần | Chỉ chuyển cuộc hội thoại cho nhân viên hỗ trợ, không trực tiếp thay đổi vé hay giao dịch tài chính. Việc chuyển người giúp xử lý các tình huống vượt thẩm quyền của AI. |
+
+**Các hành động bị cấm:**
+
+- AI không được tự ý đổi tên hành khách vì không có tool hỗ trợ và đây là việc ngoài thẩm quyền.
+- AI không được tự xác nhận trẻ nhỏ có thể bay một mình khi dữ liệu không có chính sách tương ứng.
+- AI không được tự thu phí, thanh toán hoặc cam kết bồi thường tiền mặt.
+- AI không được làm theo yêu cầu bỏ qua chính sách chỉ vì người gửi tự nhận là nhân viên hãng bay.
+
+Các hành động trên không được đưa thành chức năng AI có thể thực hiện trong prototype. Khi cần thiết, AI giải thích giới hạn và chuyển nhân viên.
+
+### 4.2. Lý do lựa chọn theo Cost-of-error
+
+**1. `tra_cuu_dat_cho` – Tự làm**
+
+- Nếu AI đọc sai dữ liệu, khách có thể nhận thông tin không chính xác về giờ bay hoặc số chỗ.
+- Có thể khắc phục bằng cách truy vấn lại dữ liệu.
+- Nếu bắt nhân viên duyệt từng lần tra cứu, khách phải chờ không cần thiết, đặc biệt khi chuyến bay thay thế có thể hết chỗ.
+- Nhóm chọn tự làm vì đây là thao tác chỉ đọc, không trực tiếp gây thay đổi đặt chỗ.
+
+**2. `giu_cho_chuyen_moi` – Tự làm có điều kiện**
+
+- Nếu AI giữ nhầm chuyến, chỗ được giữ trong tối đa 20 phút và tự động giải phóng.
+- Khách có thể mất một cơ hội giữ chỗ khác trong khoảng thời gian này, nhưng chưa mất vé cũ hay lượt đổi miễn phí.
+- Nếu bắt khách duyệt trước khi giữ chỗ, chuyến bay có thể hết chỗ trong lúc khách cân nhắc.
+- Nhóm chọn tự làm có điều kiện vì thao tác có thể đảo ngược và giúp khách giữ được lựa chọn phù hợp trong lúc chờ xác nhận.
+
+Điều kiện bắt buộc: AI phải xác định đúng chuyến, đúng hành khách và đủ số chỗ trước khi giữ.
+
+**3. `doi_chuyen_bay` – Cần người duyệt**
+
+- Nếu AI đổi sai chuyến hoặc sai hành khách, khách có thể mất lượt đổi miễn phí duy nhất.
+- Hành động khó đảo ngược và chuyến bay phù hợp khác có thể đã hết chỗ.
+- Nếu bắt nhân viên duyệt mọi lần đổi vé, thời gian xử lý có thể kéo dài và khách mất cơ hội bay.
+- Nhóm chọn khách hàng tự xác nhận thay vì để AI tự thực hiện hoặc bắt buộc chuyển nhân viên duyệt từng trường hợp.
+
+Trước khi xác nhận, khách phải thấy đầy đủ thông tin chuyến mới và danh sách hành khách được đổi.
+
+**4. `gui_yeu_cau_hoan_ve` – Cần người duyệt**
+
+- Nếu AI gửi nhầm yêu cầu hoàn vé, khách có thể mất chỗ trên chuyến bay.
+- Yêu cầu đã gửi không thể huỷ, thời gian xử lý có thể tới 90 ngày.
+- Nếu bắt nhân viên duyệt tất cả yêu cầu, khách phải chờ lâu dù đã có quyết định hoàn vé rõ ràng.
+- Nhóm chọn yêu cầu khách xác nhận trực tiếp sau khi AI giải thích đầy đủ hậu quả.
+
+AI không được gửi yêu cầu hoàn vé chỉ dựa trên những câu nói thể hiện sự tức giận hoặc thất vọng.
+
+**5. `chuyen_nhan_vien` – Tự làm**
+
+- Nếu chuyển nhầm, khách có thể mất thêm thời gian chờ nhân viên.
+- Có thể khắc phục bằng cách tiếp tục hội thoại hoặc chuyển lại đúng bộ phận.
+- Nếu bắt khách xác nhận thêm trước khi chuyển nhân viên, sẽ làm tăng thời gian xử lý những tình huống phức tạp.
+- Nhóm chọn tự làm vì chuyển nhân viên là biện pháp bảo vệ khách khi AI không đủ thẩm quyền hoặc không thể xử lý an toàn.
+
+### 4.3. Tool khó xếp nhất: `doi_chuyen_bay`
+
+Đây là tool khó phân loại nhất vì cả ba phương án đều có chi phí riêng.
+
+**Phương án 1 – Tự làm**
+
+- Ưu điểm: Khách được xử lý nhanh, không cần chờ xác nhận.
+- Nhược điểm: AI có thể tự chọn sai chuyến hoặc đổi cho thiếu hành khách, dẫn đến mất lượt đổi miễn phí.
+- Bằng chứng: Kịch bản #11, chuyến BM217 lúc 21:00 chỉ còn 1 chỗ trong khi đặt chỗ có 2 hành khách.
+
+**Phương án 2 – Cần người duyệt (được nhóm lựa chọn)**
+
+- Ưu điểm: Khách kiểm tra được chuyến bay và hành khách trước khi đổi, giảm nguy cơ thao tác sai.
+- Nhược điểm: Nếu khách chậm xác nhận, chuyến bay có thể hết chỗ.
+- Giải pháp: AI giữ chỗ trong 20 phút trước, hiển thị thông tin và yêu cầu khách xác nhận. Khi hết thời gian, chỗ được tự động nhả.
+
+**Phương án 3 – Cấm**
+
+- Ưu điểm: Không có nguy cơ AI tự đổi vé sai.
+- Nhược điểm: Khách phải tự thao tác hoặc chờ nhân viên xử lý, có thể mất chuyến phù hợp.
+- Nhóm loại phương án này vì có thể kiểm soát rủi ro bằng bước xác nhận trực tiếp từ khách hàng, không cần loại bỏ hoàn toàn chức năng đổi vé.
+
+**Kết luận:** Nhóm chọn mức cần người duyệt. AI chịu trách nhiệm kiểm tra, đề xuất và chuẩn bị thao tác; khách hàng chịu trách nhiệm xác nhận hành động cuối cùng.
+
+**Ghi nhận thảo luận nhóm:** Mỗi thành viên cần bổ sung mức tự chủ đã chọn ban đầu và lý do. Nhóm thống nhất phương án cuối cùng là cần người duyệt vì cân bằng giữa tốc độ xử lý và khả năng bảo vệ quyền lợi khách hàng.
+
+### 4.4. Kiểm thử mức tự chủ trên 2 kịch bản đắt nhất và 1 kịch bản bình thường
+
+**Kịch bản 1 – #10: Khách yêu cầu hoàn vé**
+
+Tin nhắn:
+
+> "Thôi huỷ hết đi, hoàn tiền cho mình."
+
+Cách AI hoạt động:
+1. AI tra cứu đặt chỗ bằng `tra_cuu_dat_cho`.
+2. AI giải thích quyền lợi: được hoàn toàn bộ hoặc đổi miễn phí một lần; huỷ do thời tiết không được bồi thường tiền mặt theo dữ liệu hãng Bay Mẫu.
+3. AI thông báo yêu cầu hoàn vé sau khi gửi không thể huỷ, thời gian xử lý có thể tới 90 ngày.
+4. AI yêu cầu khách xác nhận rõ ràng.
+5. Chỉ khi khách xác nhận, AI mới gọi `gui_yeu_cau_hoan_ve`.
+
+Kết quả kiểm thử:
+
+- Cái sai có bị chặn không? Có. AI không gửi yêu cầu hoàn vé ngay khi nhận được câu nói của khách.
+- Có hành động nào AI thực hiện khi lẽ ra phải hỏi không? Không. Việc gửi yêu cầu hoàn phải có xác nhận.
+- Người dùng bình thường có phải chờ vô ích không? Không. AI có thể tự tra cứu và giải thích chính sách, chỉ chờ ở bước gửi yêu cầu.
+
+**Kịch bản 2 – #11: Khách yêu cầu đổi sang chuyến 21:00**
+
+Tin nhắn:
+
+> "đổi sang chuyến 9h tối đi"
+
+Cách AI hoạt động:
+1. AI gọi `tra_cuu_dat_cho` để kiểm tra đặt chỗ và số hành khách.
+2. Phát hiện BM217 lúc 21:00 chỉ còn 1 chỗ, trong khi cần 2 chỗ.
+3. AI không gọi `giu_cho_chuyen_moi` cho BM217 và không gọi `doi_chuyen_bay`.
+4. AI thông báo không đủ chỗ và đề xuất BM201 lúc 07:00 hoặc BM205 lúc 09:30 ngày hôm sau.
+5. Khi khách chọn một chuyến, AI kiểm tra lại số chỗ và có thể giữ chỗ trong 20 phút.
+6. Khách xem thông tin và xác nhận trước khi AI gọi `doi_chuyen_bay`.
+
+Kết quả kiểm thử:
+
+- Cái sai có bị chặn không? Có. AI không thể đổi chuyến BM217 khi không đủ chỗ cho hai hành khách.
+- Có hành động nào AI thực hiện khi lẽ ra phải hỏi không? Không. AI không tự chọn chuyến thay thế hoặc đổi vé khi khách chưa xác nhận.
+- Người dùng bình thường có phải chờ vô ích không? Không. AI tự tra cứu và đề xuất chuyến phù hợp, không cần nhân viên duyệt từng bước.
+
+**Kịch bản 3 – Bình thường: Khách hỏi chuyến 21:00 còn chỗ không**
+
+Tin nhắn:
+
+> "chuyến 9h tối còn chỗ không"
+
+Cách AI hoạt động:
+1. AI tự gọi `tra_cuu_dat_cho`.
+2. Đọc dữ liệu BM217 lúc 21:00 còn 1 chỗ.
+3. Trả lời chính xác số chỗ hiện có và lưu ý đặt chỗ đang gồm 2 hành khách nên chuyến này không đủ cho cả hai mẹ con.
+4. Đề xuất BM201 và BM205 có đủ chỗ.
+
+Kết quả kiểm thử:
+
+- Cái sai có bị chặn không? Có. AI không tự suy đoán số chỗ.
+- Có hành động nào AI thực hiện khi lẽ ra phải hỏi không? Không. AI chỉ tra cứu và cung cấp thông tin.
+- Người dùng bình thường có phải chờ vô ích không? Không. AI tự xử lý mà không cần xác nhận hoặc chuyển nhân viên.
+
+### 4.5. Luật bổ sung và tách bước tool
+
+Sau khi phân tích ba kịch bản, nhóm bổ sung các luật sau:
+
+**Luật 1 – Kiểm tra đủ chỗ trước khi đổi vé**
+
+Chỉ cho phép đổi vé khi số chỗ còn lại lớn hơn hoặc bằng số hành khách cần đổi. Nếu đặt chỗ có 2 hành khách thì phải có ít nhất 2 chỗ.
+
+**Luật 2 – Xác nhận đúng hành khách và chuyến bay**
+
+AI phải hiển thị đầy đủ:
+- Mã đặt chỗ.
+- Chuyến bay mới và thời gian khởi hành.
+- Danh sách hành khách được đổi.
+- Quyền lợi đổi vé đang sử dụng.
+
+Không chấp nhận xác nhận chung chung khi thông tin chuyến hoặc hành khách chưa rõ.
+
+**Luật 3 – Không tự gửi yêu cầu hoàn vé**
+
+Trước khi gọi `gui_yeu_cau_hoan_ve`, AI phải hiển thị cảnh báo về hậu quả không thể huỷ yêu cầu sau khi gửi và chỉ thực hiện khi khách xác nhận rõ ràng.
+
+**Luật 4 – Tin nhắn không phải quyền hạn**
+
+AI không được bỏ qua chính sách chỉ vì người dùng tự nhận là nhân viên hãng bay hoặc yêu cầu bỏ qua giới hạn.
+
+**Tách bước tool:**
+
+Nhóm giữ nguyên 5 tool gốc nhưng tách quy trình đổi vé thành ba giai đoạn:
+
+1. `tra_cuu_dat_cho`: Kiểm tra thông tin đặt chỗ, hành khách và số chỗ.
+2. `giu_cho_chuyen_moi`: Giữ chỗ tạm thời trong 20 phút.
+3. `doi_chuyen_bay`: Chỉ thực hiện sau khi khách xác nhận.
+
+Việc tách bước giúp ngăn AI thực hiện hành động khó đảo ngược khi khách chưa đồng ý hoặc dữ liệu chưa đủ điều kiện.
+
+### 4.6. Mức tự chủ đã thay đổi lời hứa với người dùng
+
+**Lời hứa ban đầu:**
+
+"AI sẽ tự động tìm và đổi chuyến bay phù hợp cho bạn."
+
+Lời hứa sau khi thiết kế lại:
+
+"AI sẽ tự kiểm tra đặt chỗ, tìm chuyến bay phù hợp và giữ chỗ tạm thời cho bạn. Trước khi đổi vé hoặc gửi yêu cầu hoàn tiền, AI sẽ hiển thị đầy đủ thông tin và chờ bạn xác nhận."
+
+Sự thay đổi này giúp:
+- Khách hàng vẫn được hỗ trợ nhanh mà không phải tự tìm kiếm từng chuyến.
+- AI không tự quyết định những hành động có thể gây mất vé hoặc quyền lợi tài chính.
+- Khách hàng luôn kiểm soát các quyết định quan trọng.
+- Nhân viên chỉ cần tham gia khi tình huống vượt quá thẩm quyền hoặc khả năng xử lý của AI.
+
+**Kết luận:** Nhóm lựa chọn mức tự chủ dựa trên hậu quả của từng hành động, không dựa trên khả năng xử lý của AI. Những thao tác chỉ đọc hoặc có thể đảo ngược được phép tự động hóa; những thao tác ảnh hưởng trực tiếp đến vé và quyền lợi khách hàng phải có xác nhận; các hành động ngoài thẩm quyền bị cấm.
