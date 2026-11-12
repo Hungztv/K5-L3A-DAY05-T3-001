@@ -356,3 +356,192 @@ Sự thay đổi này giúp:
 - Nhân viên chỉ cần tham gia khi tình huống vượt quá thẩm quyền hoặc khả năng xử lý của AI.
 
 **Kết luận:** Nhóm lựa chọn mức tự chủ dựa trên hậu quả của từng hành động, không dựa trên khả năng xử lý của AI. Những thao tác chỉ đọc hoặc có thể đảo ngược được phép tự động hóa; những thao tác ảnh hưởng trực tiếp đến vé và quyền lợi khách hàng phải có xác nhận; các hành động ngoài thẩm quyền bị cấm.
+
+# §5 · PROTOTYPE
+
+## 5.1. Ý tưởng prototype
+
+**Tên prototype:** Smart Flight Change – AI hỗ trợ đổi chuyến bay an toàn.
+
+**Kịch bản được chọn:** #11 – Khách yêu cầu đổi sang chuyến 21:00 nhưng chuyến bay chỉ còn 1 chỗ trong khi đặt chỗ có 2 hành khách.
+
+**Mục tiêu thiết kế:**
+
+Prototype tập trung thể hiện cách AI xử lý một yêu cầu đổi chuyến có rủi ro cao. Thay vì tự động đổi vé ngay khi nhận yêu cầu, AI phải kiểm tra dữ liệu, nhận diện giới hạn, giải thích rủi ro và để khách hàng quyết định trước khi thực hiện hành động quan trọng.
+
+Prototype gồm 2 màn hình chính:
+
+- **Màn hình 1 – Kiểm tra và phát hiện rủi ro:** Hiển thị yêu cầu khách hàng, trạng thái kiểm tra, thông tin chuyến bay và lý do AI không thể thực hiện đổi vé.
+- **Màn hình 2 – Lựa chọn và xác nhận:** Hiển thị các chuyến bay thay thế, thông tin giữ chỗ và bước xác nhận đổi vé.
+
+## 5.2. Thiết kế màn hình
+
+### Màn hình 1 – Phát hiện rủi ro
+
+**Nội dung hiển thị:**
+
+**Thông tin đặt chỗ**
+- Mã đặt chỗ: TRV-7Q2K.
+- Hành khách: Nguyễn Minh An.
+- Hành khách đi cùng: Nguyễn Gia Bình (5 tuổi).
+- Số hành khách: 2.
+
+**Hội thoại**
+
+Khách hàng:
+
+> đổi sang chuyến 9h tối đi
+
+AI:
+
+> Mình đang kiểm tra tình trạng chuyến bay và số chỗ cho cả hai hành khách.
+
+Sau khi kiểm tra, AI hiển thị:
+
+**Kết quả kiểm tra chuyến BM217**
+- Tuyến bay: Hà Nội → TP.HCM.
+- Giờ khởi hành: 21:00.
+- Số chỗ còn trống: 1.
+- Số hành khách cần đổi: 2.
+
+**Cảnh báo: Không đủ chỗ**
+
+> Chuyến bay BM217 hiện chỉ còn 1 chỗ, trong khi đặt chỗ của bạn có 2 hành khách. Mình chưa thực hiện đổi vé để tránh việc hai mẹ con không thể cùng bay.
+
+**Độ tin cậy và nguồn dữ liệu**
+
+- Trạng thái: Đã kiểm tra.
+- Nguồn: Dữ liệu tình trạng chỗ từ hệ thống đặt vé.
+- Kết quả: 1 chỗ còn trống tại thời điểm tra cứu.
+
+**Các nút tương tác:**
+- `Xem chuyến bay thay thế`
+- `Liên hệ nhân viên hỗ trợ`
+
+### Màn hình 2 – Chọn chuyến thay thế và xác nhận
+
+Sau khi khách chọn xem chuyến bay thay thế, AI hiển thị các phương án có đủ chỗ cho cả hai hành khách.
+
+**Các chuyến bay đề xuất:**
+
+- BM201 – 07:00 ngày hôm sau – 9 chỗ.
+- BM205 – 09:30 ngày hôm sau – 4 chỗ.
+
+Các số liệu trên sử dụng dữ liệu giả phục vụ prototype và cần được kiểm tra lại trước khi giữ chỗ thực tế.
+
+**Thông báo của AI:**
+
+> Mình tìm thấy hai chuyến có đủ chỗ cho cả hai mẹ con. Bạn có thể chọn một chuyến phù hợp. Mình sẽ giữ chỗ tạm thời trong 20 phút trước khi thực hiện đổi vé.
+
+Sau khi khách chọn BM205, hiển thị thông tin xác nhận:
+
+**Xác nhận đổi chuyến**
+
+- Chuyến hiện tại: BM213.
+- Chuyến mới: BM205.
+- Giờ khởi hành: 09:30.
+- Hành khách: Nguyễn Minh An và Nguyễn Gia Bình.
+- Thời gian giữ chỗ: 20 phút.
+- Quyền lợi: Sử dụng một lần đổi miễn phí.
+
+**Câu hỏi xác nhận:**
+
+> Bạn xác nhận đổi chuyến cho cả hai hành khách sang BM205 lúc 09:30 chứ?
+
+**Các nút tương tác:**
+- `Xác nhận đổi vé`
+- `Chọn chuyến khác`
+- `Huỷ thao tác`
+
+Sau khi khách xác nhận, prototype hiển thị trạng thái:
+
+> Đã ghi nhận xác nhận đổi chuyến. Hệ thống đang thực hiện đổi vé cho hai hành khách.
+
+Lưu ý: Đây là trạng thái mô phỏng, không thực hiện giao dịch thật.
+
+## 5.3. Thể hiện mức tự chủ trên giao diện
+
+| Mức tự chủ | Hành động | Cách thể hiện trên màn hình |
+|---|---|---|
+| AI tự làm | Tra cứu đặt chỗ, kiểm tra số chỗ, tìm chuyến thay thế | Hiển thị trạng thái đang kiểm tra và kết quả tự động. |
+| AI tự làm có điều kiện | Giữ chỗ chuyến mới | Hiển thị thời gian giữ chỗ 20 phút và trạng thái tự động giải phóng khi hết hạn. |
+| Cần người duyệt | Đổi chuyến bay, gửi yêu cầu hoàn vé | Hiển thị đầy đủ thông tin, hậu quả và nút xác nhận của khách hàng. |
+| Cấm | Đổi tên hành khách, tự ý bỏ qua chính sách, tự cam kết bồi thường | Không cung cấp nút thực hiện; hướng dẫn khách liên hệ nhân viên hỗ trợ. |
+
+**Khả năng hoàn tác:**
+
+- Tra cứu: Có thể thực hiện lại nếu kết quả không chính xác.
+- Giữ chỗ: Tự động giải phóng sau 20 phút nếu không tiếp tục.
+- Đổi vé: Không có nút hoàn tác trực tiếp; nếu xảy ra lỗi phải chuyển nhân viên xử lý.
+- Yêu cầu hoàn vé: Không cho phép tự huỷ sau khi gửi.
+
+## 5.4. Thể hiện nguyên tắc HAX/PAIR
+
+Nhóm áp dụng các nguyên tắc thiết kế sau trên prototype:
+
+| Nguyên tắc | Vị trí thể hiện | Cách áp dụng |
+|---|---|---|
+| Make clear what the system can do | Khu vực hội thoại | AI thông báo có thể tra cứu, tìm chuyến và hỗ trợ đổi vé nhưng không tự quyết định thay khách. |
+| Make clear how well the system can do | Kết quả kiểm tra chuyến bay | Hiển thị số chỗ còn lại, số hành khách và nguồn dữ liệu để khách đánh giá kết quả. |
+| Make clear why the system did what it did | Khu vực cảnh báo | Giải thích tại sao BM217 không thể được lựa chọn khi chỉ còn 1 chỗ cho 2 hành khách. |
+| Support efficient correction | Màn hình lựa chọn chuyến thay thế | Cho phép khách chọn chuyến khác hoặc huỷ thao tác mà không phải nhập lại thông tin đặt chỗ. |
+| Scope services when in doubt | Khu vực liên hệ nhân viên | Khi gặp trường hợp vượt quá thẩm quyền hoặc thiếu dữ liệu, AI dừng thao tác và chuyển nhân viên. |
+
+## 5.5. Xử lý tình huống ngoài dự kiến
+
+Nếu khách tiếp tục yêu cầu đổi sang BM217 dù chỉ còn 1 chỗ, AI không được bỏ qua điều kiện đủ chỗ.
+
+AI phản hồi:
+
+> Mình hiểu bạn muốn đi chuyến 21:00. Tuy nhiên, hiện chuyến chỉ còn 1 chỗ nên không thể đảm bảo cả hai hành khách cùng bay. Mình không thể thực hiện đổi vé trong điều kiện này. Bạn có thể chọn chuyến thay thế hoặc liên hệ nhân viên để được hỗ trợ thêm.
+
+Nếu khách yêu cầu AI tự chọn một chuyến khác:
+
+> Mình có thể đề xuất chuyến phù hợp, nhưng cần bạn xác nhận chuyến bay trước khi đổi vé.
+
+Nếu dữ liệu số chỗ không thể truy xuất hoặc không đồng nhất:
+
+> Mình chưa thể xác nhận tình trạng chỗ của chuyến bay. Để tránh đổi nhầm vé, mình sẽ tạm dừng thao tác và chuyển bạn đến nhân viên hỗ trợ.
+
+Nguyên tắc chung: Khi dữ liệu không đầy đủ, AI không được tự suy đoán hoặc tiếp tục thực hiện hành động có hậu quả khó đảo ngược.
+
+## 5.6. Các phương án thiết kế đã cân nhắc
+
+**Phương án 1 – Chatbot hội thoại thuần túy**
+
+- Ưu điểm: Giao diện đơn giản, dễ triển khai và quen thuộc với người dùng.
+- Nhược điểm: Khách phải đọc nhiều đoạn hội thoại để hiểu số chỗ, rủi ro và thông tin chuyến bay. Khó phân biệt hành động AI tự làm với hành động cần xác nhận.
+- Quyết định: Không lựa chọn.
+
+**Phương án 2 – Giao diện dashboard quản lý chuyến bay**
+
+- Ưu điểm: Hiển thị được nhiều thông tin đặt chỗ, trạng thái và dữ liệu chuyến bay.
+- Nhược điểm: Quá nhiều thông tin, không phù hợp với khách hàng phổ thông cần xử lý nhanh một yêu cầu đổi vé.
+- Quyết định: Không lựa chọn.
+
+**Phương án 3 – Chatbot kết hợp thẻ thông tin và nút hành động (được lựa chọn)**
+
+- Ưu điểm: Giữ được trải nghiệm hội thoại tự nhiên, đồng thời làm nổi bật số chỗ, cảnh báo rủi ro và các bước xác nhận.
+- Nhược điểm: Cần thiết kế rõ ràng để tránh người dùng nhầm nút xem thông tin với nút thực hiện đổi vé.
+- Quyết định: Lựa chọn vì cân bằng giữa tính dễ sử dụng, khả năng kiểm soát và mức độ tự chủ của AI.
+
+## 5.7. Kịch bản demo 4 phút
+
+| Thời gian | Thao tác | Nội dung cần thể hiện |
+|---|---|---|
+| 0:00–0:30 | Mở prototype | Giới thiệu đặt chỗ có hai hành khách. |
+| 0:30–1:15 | Nhập "đổi sang chuyến 9h tối đi" | AI tra cứu và phát hiện chỉ còn một chỗ. |
+| 1:15–2:00 | Xem cảnh báo | Giải thích tại sao AI không tự đổi vé và hiển thị nguồn dữ liệu. |
+| 2:00–3:15 | Chọn chuyến thay thế | Thể hiện việc giữ chỗ, thông tin hành khách và bước xác nhận. |
+| 3:15–4:00 | Xác nhận hoặc huỷ thao tác | Thể hiện quyền kiểm soát của người dùng và sự khác biệt giữa các mức tự chủ. |
+
+**Tiêu chí hoàn thành prototype:**
+
+- Có thể bấm qua được toàn bộ kịch bản đổi chuyến 21:00.
+- Có ít nhất hai mức tự chủ khác nhau thể hiện trực quan trên giao diện.
+- Người dùng nhìn thấy độ tin cậy, nguồn dữ liệu và lý do AI từ chối thực hiện yêu cầu.
+- Có nút xác nhận trước khi thực hiện hành động quan trọng.
+- Có đường xử lý khi dữ liệu không đầy đủ hoặc yêu cầu vượt quá thẩm quyền AI.
+- Các nguyên tắc HAX/PAIR được chỉ rõ trên từng khu vực giao diện.
+
+**Kết luận:** Prototype không tập trung vào việc tạo ra một chatbot có khả năng trả lời tự nhiên, mà tập trung chứng minh AI có thể hỗ trợ khách hàng xử lý yêu cầu đổi chuyến trong khi vẫn kiểm soát được rủi ro, minh bạch về dữ liệu và giữ quyền quyết định cuối cùng cho người dùng.
